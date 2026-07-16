@@ -18,3 +18,9 @@ body {
     Arial,
     sans-serif;
 }
+
+/* Panel resize: avoid text selection flash while dragging */
+body.resizing-panels {
+  cursor: col-resize !important;
+  user-select: none !important;
+}

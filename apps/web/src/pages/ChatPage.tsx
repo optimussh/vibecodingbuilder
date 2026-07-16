@@ -10,6 +10,8 @@ import { FileTree } from "../components/FileTree";
 import { RagPanel } from "../components/RagPanel";
 import { StatusBar } from "../components/StatusBar";
 import { PermissionCard } from "../components/PermissionCard";
+import { ResizeHandle } from "../components/ResizeHandle";
+import { usePanelWidths } from "../hooks/usePanelWidths";
 
 export function ChatPage() {
   const user = useAuthStore((s) => s.user);
@@ -21,6 +23,7 @@ export function ChatPage() {
   const connectEvents = useChatStore((s) => s.connectEvents);
   const disconnectEvents = useChatStore((s) => s.disconnectEvents);
   const [workspacePath, setWorkspacePath] = useState<string>("");
+  const { widths, setPanel, adjustPanel, reset } = usePanelWidths();
 
   useEffect(() => {
     void refreshHealth();
@@ -64,6 +67,14 @@ export function ChatPage() {
           )}
         </div>
         <div className="flex items-center gap-3 text-sm">
+          <button
+            type="button"
+            onClick={reset}
+            title="패널 너비 기본값으로 초기화"
+            className="text-xs text-zinc-500 hover:text-zinc-300"
+          >
+            레이아웃 초기화
+          </button>
           {user?.role === "admin" && (
             <Link to="/admin" className="text-indigo-400 hover:text-indigo-300">
               Admin
@@ -79,16 +90,56 @@ export function ChatPage() {
         </div>
       </header>
 
-      <div className="grid min-h-0 flex-1 grid-cols-[200px_1fr_220px_240px]">
-        <SessionList />
-        <div className="flex min-h-0 flex-col">
+      <div className="flex min-h-0 flex-1 overflow-hidden">
+        {/* Sessions */}
+        <div
+          className="min-h-0 shrink-0 overflow-hidden"
+          style={{ width: widths.sessions }}
+        >
+          <SessionList />
+        </div>
+
+        <ResizeHandle
+          onResize={(dx) => adjustPanel("sessions", dx)}
+          onDoubleClick={() => setPanel("sessions", 200)}
+          title="세션 패널 너비 · 드래그 조절 · 더블클릭 기본값"
+        />
+
+        {/* Chat (fills remaining space) */}
+        <div className="flex min-h-0 min-w-[240px] flex-1 flex-col overflow-hidden">
           <div className="min-h-0 flex-1">
             <MessageStream />
           </div>
           <Composer />
         </div>
-        <FileTree />
-        <RagPanel />
+
+        <ResizeHandle
+          onResize={(dx) => adjustPanel("files", -dx)}
+          onDoubleClick={() => setPanel("files", 220)}
+          title="파일 패널 너비 · 드래그 조절 · 더블클릭 기본값"
+        />
+
+        {/* Files */}
+        <div
+          className="min-h-0 shrink-0 overflow-hidden"
+          style={{ width: widths.files }}
+        >
+          <FileTree />
+        </div>
+
+        <ResizeHandle
+          onResize={(dx) => adjustPanel("rag", -dx)}
+          onDoubleClick={() => setPanel("rag", 240)}
+          title="RAG 패널 너비 · 드래그 조절 · 더블클릭 기본값"
+        />
+
+        {/* RAG */}
+        <div
+          className="min-h-0 shrink-0 overflow-hidden"
+          style={{ width: widths.rag }}
+        >
+          <RagPanel />
+        </div>
       </div>
 
       <StatusBar health={health} />
