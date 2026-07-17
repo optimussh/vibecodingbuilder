@@ -163,22 +163,37 @@
       </ul>
     </div>
 
-    <h2>이번에 추가된 것</h2>
+    <h2>고도화 기능</h2>
     <div class="grid two">
       <div class="card">
-        <h3><span class="badge ok">완료</span> workspace bind</h3>
-        <p class="why"><strong>왜:</strong> 로그인/Chamber 시 유저 폴더 고정 + OC 세션 directory.</p>
-        <div class="path">POST /api/workspace/bind · data/workspaces/{user}</div>
+        <h3><span class="badge ok">완료</span> Markdown 채팅</h3>
+        <p class="why"><strong>왜:</strong> 코드·목록이 읽기 쉽게 (GFM).</p>
+        <div class="path">MessageStream · react-markdown</div>
       </div>
       <div class="card">
-        <h3><span class="badge ok">완료</span> Postgres 세션·감사</h3>
-        <p class="why"><strong>왜:</strong> 재시작 후에도 소유권·감사 추적 (파일 폴백).</p>
-        <div class="path">agent_sessions · audit_events</div>
+        <h3><span class="badge ok">완료</span> Git 패널</h3>
+        <p class="why"><strong>왜:</strong> 변경 diff/상태 확인 · init.</p>
+        <div class="path">GET /api/git/status · /diff · POST /init</div>
       </div>
       <div class="card">
-        <h3><span class="badge ok">완료</span> 앱 미리보기</h3>
-        <p class="why"><strong>왜:</strong> 워크스페이스에서 만든 앱을 로컬로 바로 확인.</p>
-        <div class="path">POST /api/preview/start · /preview/app/</div>
+        <h3><span class="badge ok">완료</span> 파일 업로드</h3>
+        <p class="why"><strong>왜:</strong> 워크스페이스에 문서/소스 바로 올리기.</p>
+        <div class="path">POST /api/workspace/upload · Files → Upload</div>
+      </div>
+      <div class="card">
+        <h3><span class="badge ok">완료</span> 로그인 세션 PG</h3>
+        <p class="why"><strong>왜:</strong> 서버 재시작 후에도 로그인 유지.</p>
+        <div class="path">connect-pg-simple · web_sessions</div>
+      </div>
+      <div class="card">
+        <h3><span class="badge ok">완료</span> Rate limit · pino 로그</h3>
+        <p class="why"><strong>왜:</strong> 브루트포스·남용 완화, 요청 추적.</p>
+        <div class="path">express-rate-limit · pino-http</div>
+      </div>
+      <div class="card">
+        <h3><span class="badge ok">완료</span> workspace bind · preview</h3>
+        <p class="why"><strong>왜:</strong> Chamber 연결 · 앱 미리보기.</p>
+        <div class="path">/api/workspace/bind · /api/preview/*</div>
       </div>
     </div>
 

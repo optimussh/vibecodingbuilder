@@ -2,6 +2,7 @@ import express from "express";
 import cors from "cors";
 import cookieParser from "cookie-parser";
 import path from "node:path";
+import pinoHttp from "pino-http";
 import { createSessionMiddleware } from "./auth/session.js";
 import { authRouter } from "./auth/routes.js";
 import { healthRouter } from "./routes/health.js";
@@ -17,11 +18,15 @@ import { loginPageRouter } from "./routes/loginPage.js";
 import { quotaRouter } from "./routes/quota.js";
 import { stackRouter } from "./routes/stack.js";
 import { previewRouter, mountPreviewProxy } from "./routes/preview.js";
+import { gitRouter } from "./routes/git.js";
+import { uploadRouter } from "./routes/upload.js";
 import { proxyRouter, mountOpenChamberProxy } from "./routes/proxy.js";
+import { apiLimiter } from "./middleware/rateLimit.js";
 import * as sessionMap from "./sessionMap.js";
 import { bootstrapUserWorkspace } from "./workspaceBootstrap.js";
 import { config } from "./config.js";
 import { publicUserList } from "./users.js";
+import { log, requestId } from "./log.js";
 
 export interface CreateAppOptions {
   managedOpencode?: boolean;
@@ -34,6 +39,17 @@ export function createApp(_options: CreateAppOptions = {}) {
   }
 
   const app = express();
+
+  app.use(
+    pinoHttp({
+      logger: log,
+      genReqId: (req) =>
+        (req.headers["x-request-id"] as string) || requestId(),
+      autoLogging: {
+        ignore: (req) => req.url === "/api/ping" || req.url === "/api/stack",
+      },
+    }),
+  );
 
   app.use(
     cors({
@@ -51,6 +67,7 @@ export function createApp(_options: CreateAppOptions = {}) {
   app.use(express.json({ limit: "2mb" }));
   app.use(cookieParser());
   app.use(createSessionMiddleware());
+  app.use("/api", apiLimiter);
 
   app.use(
     "/docs/status",
@@ -79,6 +96,8 @@ export function createApp(_options: CreateAppOptions = {}) {
   app.use("/api", quotaRouter);
   app.use("/api", stackRouter);
   app.use("/api", previewRouter);
+  app.use("/api", gitRouter);
+  app.use("/api", uploadRouter);
 
   app.use(proxyRouter);
   mountOpenChamberProxy(app);

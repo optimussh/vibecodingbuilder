@@ -224,4 +224,46 @@ export const api = {
       direct?: string;
     }>("/api/preview");
   },
+  gitStatus() {
+    return request<{
+      isRepo: boolean;
+      cwd?: string;
+      branch?: string | null;
+      modified?: string[];
+      staged?: string[];
+      not_added?: string[];
+      message?: string;
+    }>("/api/git/status");
+  },
+  gitInit() {
+    return request<{ ok: boolean; cwd: string }>("/api/git/init", {
+      method: "POST",
+      body: JSON.stringify({}),
+    });
+  },
+  gitDiff(staged = false) {
+    return request<{ isRepo: boolean; diff: string }>(
+      `/api/git/diff${staged ? "?staged=1" : ""}`,
+    );
+  },
+  sessionDiff(id: string) {
+    return request<unknown>(`/api/sessions/${id}/diff`);
+  },
+  async workspaceUpload(file: File, dir = ".") {
+    const fd = new FormData();
+    fd.append("file", file);
+    fd.append("dir", dir);
+    const res = await fetch("/api/workspace/upload", {
+      method: "POST",
+      credentials: "include",
+      body: fd,
+    });
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok) {
+      throw new Error(
+        (data as { error?: string }).error ?? `HTTP ${res.status}`,
+      );
+    }
+    return data as { ok: boolean; path: string; bytes: number };
+  },
 };

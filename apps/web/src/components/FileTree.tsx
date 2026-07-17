@@ -42,13 +42,30 @@ export function FileTree() {
     <div className="flex h-full flex-col border-l border-zinc-800 bg-zinc-900/40">
       <div className="flex items-center justify-between border-b border-zinc-800 p-3">
         <span className="text-sm font-medium text-zinc-200">Files</span>
-        <button
-          type="button"
-          onClick={() => void loadFiles()}
-          className="text-xs text-indigo-400 hover:text-indigo-300"
-        >
-          Refresh
-        </button>
+        <div className="flex items-center gap-2">
+          <label className="cursor-pointer text-xs text-emerald-400 hover:text-emerald-300">
+            Upload
+            <input
+              type="file"
+              className="hidden"
+              onChange={(e) => {
+                const f = e.target.files?.[0];
+                if (!f) return;
+                void import("../api/client").then(({ api }) =>
+                  api.workspaceUpload(f).then(() => loadFiles()),
+                );
+                e.target.value = "";
+              }}
+            />
+          </label>
+          <button
+            type="button"
+            onClick={() => void loadFiles()}
+            className="text-xs text-indigo-400 hover:text-indigo-300"
+          >
+            Refresh
+          </button>
+        </div>
       </div>
       <div className="flex-1 overflow-y-auto py-2">
         {tree.map((n) => (

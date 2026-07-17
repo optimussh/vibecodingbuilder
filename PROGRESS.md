@@ -64,6 +64,12 @@
 - **Why:** 남은 로컬 가능 작업(연결·영속·미리보기) 일괄 완료
 - **Status:** done
 
+#### 고도화 배치
+
+- **What:** 채팅 Markdown(GFM), Git status/diff/init 패널, 워크스페이스 파일 업로드, express-session → Postgres `web_sessions`, 로그인·API·메시지 rate limit, pino HTTP 로깅, `GET /api/sessions/:id/diff`
+- **Why:** 로컬 프로덕션 UX·보안·관측성 강화
+- **Status:** done
+
 ### 이전 완료 (MVP)
 
 | 커밋 | 내용 |

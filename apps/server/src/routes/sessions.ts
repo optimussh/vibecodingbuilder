@@ -3,7 +3,6 @@ import { requireAuth } from "../auth/requireAuth.js";
 import { checkOpencodeHealth } from "../opencode/client.js";
 import {
   opencodeFetch,
-  opencodeUrl,
   parseJsonBody,
   sessionIdOf,
   directoryOf,
@@ -12,6 +11,7 @@ import * as sessionMap from "../sessionMap.js";
 import { appendAudit } from "../audit.js";
 import { config } from "../config.js";
 import { ensureWorkspace } from "../workspace.js";
+import { messageLimiter } from "../middleware/rateLimit.js";
 
 export const sessionsRouter = Router();
 
@@ -173,6 +173,30 @@ sessionsRouter.delete("/sessions/:id", requireAuth, async (req, res) => {
   }
 });
 
+sessionsRouter.get("/sessions/:id/diff", requireAuth, async (req, res) => {
+  try {
+    await requireOpencodeUp();
+    const username = req.session.user!.username;
+    const id = req.params.id;
+    const rec = requireSessionOwner(id, username);
+    const q = req.query.messageID
+      ? `?messageID=${encodeURIComponent(String(req.query.messageID))}`
+      : "";
+    const result = await opencodeFetch(`/session/${id}/diff${q}`, {
+      method: "GET",
+      directory: rec.workspace,
+    });
+    if (!result.ok) {
+      res.status(result.status).json({ error: await result.text() });
+      return;
+    }
+    res.json(await parseJsonBody(result));
+  } catch (e) {
+    const err = e as Error & { status?: number };
+    res.status(err.status ?? 502).json({ error: err.message });
+  }
+});
+
 sessionsRouter.get("/sessions/:id/messages", requireAuth, async (req, res) => {
   try {
     await requireOpencodeUp();
@@ -195,7 +219,11 @@ sessionsRouter.get("/sessions/:id/messages", requireAuth, async (req, res) => {
   }
 });
 
-sessionsRouter.post("/sessions/:id/messages", requireAuth, async (req, res) => {
+sessionsRouter.post(
+  "/sessions/:id/messages",
+  requireAuth,
+  messageLimiter,
+  async (req, res) => {
   try {
     await requireOpencodeUp();
     const username = req.session.user!.username;

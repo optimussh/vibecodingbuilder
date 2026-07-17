@@ -8,6 +8,7 @@ import { MessageStream } from "../components/MessageStream";
 import { Composer } from "../components/Composer";
 import { FileTree } from "../components/FileTree";
 import { RagPanel } from "../components/RagPanel";
+import { GitPanel } from "../components/GitPanel";
 import { StatusBar } from "../components/StatusBar";
 import { PermissionCard } from "../components/PermissionCard";
 import { ResizeHandle } from "../components/ResizeHandle";
@@ -160,6 +161,7 @@ export function ChatPage() {
             <MessageStream />
           </div>
           <Composer />
+          <GitPanel />
         </div>
 
         <ResizeHandle

@@ -3,10 +3,11 @@ import { findUser, verifyPassword } from "../users.js";
 import { appendAudit } from "../audit.js";
 import { requireAuth } from "./requireAuth.js";
 import { bootstrapUserWorkspace } from "../workspaceBootstrap.js";
+import { loginLimiter } from "../middleware/rateLimit.js";
 
 export const authRouter = Router();
 
-authRouter.post("/login", (req, res) => {
+authRouter.post("/login", loginLimiter, (req, res) => {
   const username = String(req.body?.username ?? "").trim();
   const password = String(req.body?.password ?? "");
 
