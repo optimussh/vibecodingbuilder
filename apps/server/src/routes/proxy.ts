@@ -149,46 +149,58 @@ const opencodeProxy = createProxyMiddleware({
 
 proxyRouter.use("/opencode", opencodeProxy);
 
-/** Optional reverse proxy to OpenChamber UI/API when OPENCHAMBER_ENABLED=true */
+/**
+ * OpenChamber SPA uses absolute asset paths (/assets/...).
+ * Path-prefix reverse proxy (/chamber → :3001) breaks JS/CSS load → blank UI.
+ * Local fix: after auth, **redirect** to direct OpenChamber origin (default :3001).
+ */
 export function mountOpenChamberProxy(app: import("express").Express): void {
-  if (!config.openchamberEnabled || !config.openchamberUrl) {
-    app.get("/chamber", requireAuthOrLogin, (_req, res) => {
+  const handler = (req: Request, res: Response) => {
+    if (!config.openchamberEnabled || !config.openchamberUrl) {
       res.status(503).type("html").send(chamberNotReadyHtml());
-    });
-    app.get("/chamber/*path", requireAuthOrLogin, (_req, res) => {
-      res.status(503).type("html").send(chamberNotReadyHtml());
-    });
-    return;
-  }
+      return;
+    }
+    appendAudit("chamber.redirect", req.session.user?.username);
+    const target = config.openchamberUrl.replace(/\/$/, "");
+    // Prefer HTML bridge so user understands two UIs (legacy chat vs chamber)
+    const accept = String(req.headers.accept ?? "");
+    if (accept.includes("text/html") || req.method === "GET") {
+      res.type("html").send(chamberLaunchHtml(target));
+      return;
+    }
+    res.redirect(302, target);
+  };
 
-  const chamberProxy = createProxyMiddleware({
-    target: config.openchamberUrl,
-    changeOrigin: true,
-    ws: true,
-    pathRewrite: { "^/chamber": "" },
-    on: {
-      error: (err, _req, res) => {
-        const r = res as Response;
-        if (!r.headersSent) {
-          r.status(502)
-            .type("html")
-            .send(
-              `<h1>OpenChamber proxy error</h1><pre>${err.message}</pre><p><a href="/">Portal</a></p>`,
-            );
-        }
-      },
-    },
-  });
+  app.get("/chamber", requireAuthOrLogin, handler);
+  app.get("/chamber/*path", requireAuthOrLogin, handler);
+}
 
-  app.use(
-    "/chamber",
-    requireAuthOrLogin,
-    (req: Request, _res: Response, next: NextFunction) => {
-      appendAudit("chamber.access", req.session.user?.username);
-      next();
-    },
-    chamberProxy,
-  );
+function chamberLaunchHtml(target: string): string {
+  return `<!doctype html>
+<html lang="ko"><head><meta charset="utf-8"/>
+<meta http-equiv="refresh" content="0;url=${target}"/>
+<title>OpenChamber 실행</title>
+<style>
+body{font-family:system-ui;background:#0c0d10;color:#e8eaed;padding:2rem;max-width:36rem;margin:auto;line-height:1.5}
+a{color:#7c9cff} .card{border:1px solid #2a2e38;background:#15171c;border-radius:12px;padding:1rem;margin:1rem 0}
+code{background:#0a0b0e;padding:.1rem .35rem;border-radius:4px}
+.muted{color:#9aa0a6;font-size:.9rem}
+</style></head>
+<body>
+  <h1>OpenChamber로 이동 중…</h1>
+  <p class="muted">경로 프록시(<code>/chamber</code>)는 SPA 정적 파일을 깨뜨려 채팅이 안 보입니다.
+  로컬에서는 <strong>직접 포트 :3001</strong> 로 엽니다.</p>
+  <div class="card">
+    <p><a href="${target}"><strong>OpenChamber 열기 →</strong></a> <code>${target}</code></p>
+    <p class="muted">안 뜨면 터미널에서 <code>npm run chamber</code> 후 다시 시도.</p>
+  </div>
+  <div class="card">
+    <p><strong>채팅이 필요하면 (레거시 UI)</strong></p>
+    <p><a href="http://127.0.0.1:5173/">http://127.0.0.1:5173/</a> — 로그인 후 세션 목록·입력창이 바로 보입니다.</p>
+  </div>
+  <p><a href="/">← 포털</a></p>
+  <script>location.replace(${JSON.stringify(target)});</script>
+</body></html>`;
 }
 
 function chamberNotReadyHtml(): string {
@@ -198,13 +210,8 @@ function chamberNotReadyHtml(): string {
 code{background:#15171c;padding:.15rem .4rem;border-radius:4px}a{color:#7c9cff}</style></head>
 <body>
 <h1>OpenChamber 아직 연결되지 않음</h1>
-<p>게이트웨이는 준비됐습니다. 업스트림 OpenChamber를 띄운 뒤 <code>.env</code>에 설정하세요.</p>
-<ol>
-<li><code>pwsh scripts/fetch-openchamber.ps1</code></li>
-<li><code>cd vendor/openchamber &amp;&amp; bun install &amp;&amp; bun run dev:web:hmr</code></li>
-<li><code>OPENCHAMBER_ENABLED=true</code> · <code>OPENCHAMBER_URL=http://127.0.0.1:PORT</code></li>
-<li>게이트웨이 재시작 후 <a href="/chamber">/chamber</a></li>
-</ol>
-<p><a href="/">← 포털</a> · <a href="http://localhost:5173">레거시 UI</a></p>
+<p>채팅(레거시): <a href="http://127.0.0.1:5173/">http://127.0.0.1:5173/</a></p>
+<p>Chamber 기동: <code>npm run chamber</code> (OpenCode :4096 필요)</p>
+<p><a href="/">← 포털</a></p>
 </body></html>`;
 }

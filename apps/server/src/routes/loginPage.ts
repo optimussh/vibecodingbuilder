@@ -31,12 +31,13 @@ loginPageRouter.get("/login", (req, res) => {
     button:hover{background:#3d5bd9}
     .err{color:#f87171;font-size:.85rem;margin-top:.75rem}
     .hint{font-size:.7rem;color:#6b7280;margin-top:1rem}
+    a{color:#7c9cff}
   </style>
 </head>
 <body>
   <form id="f">
     <h1>Vibecoding Builder</h1>
-    <p>플랫폼 로그인 (admin / user1 / user2)</p>
+    <p>플랫폼 로그인 후 목적지로 이동합니다</p>
     <label>Username</label>
     <input name="username" id="u" value="user1" autocomplete="username" required />
     <label>Password</label>
@@ -44,6 +45,8 @@ loginPageRouter.get("/login", (req, res) => {
     <button type="submit">Login</button>
     <div class="err" id="e">${err ? "로그인 실패" : ""}</div>
     <p class="hint">admin/admin123 · user1/user1 · user2/user2</p>
+    <p class="hint">채팅 UI: <a href="http://127.0.0.1:5173/">http://127.0.0.1:5173/</a><br/>
+    OpenChamber: <a href="http://127.0.0.1:3001/">http://127.0.0.1:3001/</a></p>
   </form>
   <script>
     const next = ${JSON.stringify(next)};

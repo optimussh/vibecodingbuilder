@@ -51,10 +51,17 @@ export function MessageStream() {
           </div>
         ))}
         {messages.length === 0 && (
-          <p className="text-sm text-zinc-500">
-            세션을 만들고 메시지를 보내면 OpenCode 에이전트가 워크스페이스에
-            파일을 만듭니다.
-          </p>
+          <div className="rounded-lg border border-zinc-800 bg-zinc-900/40 p-4 text-sm text-zinc-400">
+            <p className="font-medium text-zinc-200">채팅 준비됨</p>
+            <p className="mt-2">
+              왼쪽에서 세션을 고르거나 <strong className="text-indigo-300">+ New</strong> 로
+              새 세션을 만드세요. 아래 입력창에 자연어로 지시하면 에이전트가
+              워크스페이스에 파일을 만듭니다.
+            </p>
+            <p className="mt-2 text-xs text-zinc-600">
+              예: <code className="text-zinc-400">hello.txt 만들어줘</code>
+            </p>
+          </div>
         )}
       </div>
       <div className="max-h-28 overflow-y-auto border-t border-zinc-800 bg-zinc-950 px-3 py-2 font-mono text-[10px] text-zinc-500">

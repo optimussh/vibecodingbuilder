@@ -25,6 +25,11 @@ export function ChatPage() {
   const [workspacePath, setWorkspacePath] = useState<string>("");
   const { widths, setPanel, adjustPanel, reset } = usePanelWidths();
 
+  const createSession = useChatStore((s) => s.createSession);
+  const sessions = useChatStore((s) => s.sessions);
+  const activeSessionId = useChatStore((s) => s.activeSessionId);
+  const [autoSessionTried, setAutoSessionTried] = useState(false);
+
   useEffect(() => {
     void refreshHealth();
     void loadSessions();
@@ -46,6 +51,23 @@ export function ChatPage() {
     connectEvents,
     disconnectEvents,
   ]);
+
+  // Auto-open first chat session so the composer is usable after login
+  useEffect(() => {
+    if (autoSessionTried) return;
+    if (activeSessionId) {
+      setAutoSessionTried(true);
+      return;
+    }
+    if (sessions.length > 0) {
+      setAutoSessionTried(true);
+      return;
+    }
+    setAutoSessionTried(true);
+    void createSession().catch(() => {
+      // OpenCode down — StatusBar already shows it
+    });
+  }, [sessions, activeSessionId, autoSessionTried, createSession]);
 
   return (
     <div className="flex h-full flex-col">

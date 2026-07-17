@@ -47,6 +47,12 @@
 - **Why:** 수동 포트 맞추기 없이 로컬 풀스택 기동.
 - **Status:** done (chamber log: external OpenCode 4096)
 
+#### 채팅 안 보이던 문제 수정
+
+- **What:** `/chamber` path-proxy는 SPA 절대경로 `/assets` 를 깨뜨려 빈 화면 → 로그인 후 **:3001 직접 런치 페이지**로 변경. 레거시 채팅 로그인 후 `navigate('/')`, 세션 자동 생성, 포털에 “채팅 UI :5173” 강조.
+- **Why:** “로그인만 되고 채팅창 없음” 은 버그였음 (정상 아님).
+- **Status:** done
+
 ### 이전 완료 (MVP)
 
 | 커밋 | 내용 |

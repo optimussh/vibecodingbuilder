@@ -41,10 +41,12 @@ portalRouter.get("/", (req, res) => {
         : `<p class="muted"><a href="/login?next=/chamber">로그인</a> 후 Chamber · 계정 admin/user1/user2</p>`
     }
     <div id="stack">스택 상태 로딩…</div>
-    <a class="card" href="/login?next=/chamber"><strong>OpenChamber (권장)</strong><br/>
-      <span class="muted">게이트웨이 프록시 → :3001 · IDE급 세션/diff/터미널</span></a>
-    <a class="card" href="http://localhost:5173"><strong>레거시 앱 UI</strong><br/>
-      <span class="muted">채팅 · 파일 · RAG 패널 · 리사이즈</span></a>
+    <a class="card" href="http://127.0.0.1:5173/"><strong>채팅 UI (레거시) — 채팅창 여기</strong><br/>
+      <span class="muted">로그인 → 세션 목록 · 메시지 · 입력창 · RAG. 포트 5173</span></a>
+    <a class="card" href="/chamber"><strong>OpenChamber IDE</strong><br/>
+      <span class="muted">로그인 후 :3001 로 이동 (채팅 셸). <code>npm run chamber</code> 필요</span></a>
+    <a class="card" href="http://127.0.0.1:3001/"><strong>OpenChamber 직접 (:3001)</strong><br/>
+      <span class="muted">정적 파일 정상 로드 · OpenCode :4096 공유</span></a>
     <a class="card" href="/docs/status/index.html"><strong>진행 현황 보드</strong><br/>
       <span class="muted">기능 · 왜 · 다음 방향</span></a>
     <a class="card" href="/api/stack"><strong>Stack JSON</strong><br/>
