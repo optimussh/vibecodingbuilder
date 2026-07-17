@@ -10,8 +10,11 @@ fs.mkdirSync(config.auditDir, { recursive: true });
 const app = createApp();
 
 const server = app.listen(config.port, () => {
-  console.log(`[server] http://127.0.0.1:${config.port}`);
-  console.log(`[server] workspaces: ${config.workspacesRoot}`);
+  console.log(`[server] portal     http://127.0.0.1:${config.port}/`);
+  console.log(`[server] chamber    http://127.0.0.1:${config.port}/chamber  → ${config.openchamberUrl} (${config.openchamberEnabled ? "on" : "off"})`);
+  console.log(`[server] opencode   proxy /opencode  → ${config.opencodeBaseUrl}`);
+  console.log(`[server] legacy ui  http://localhost:5173`);
+  console.log(`[server] workspaces ${config.workspacesRoot}`);
   console.log(
     `[server] llm: ${config.geminiApiKey ? "GEMINI_API_KEY set" : "GEMINI_API_KEY missing"}`,
   );

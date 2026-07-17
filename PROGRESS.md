@@ -41,6 +41,12 @@
 - **Why:** 프로덕션 셸을 레거시 UI만이 아니라 OpenChamber로도 진입 가능하게.
 - **Status:** done (스모크: chamber HTML 200, opencode proxy healthy, 비로그인 401)
 
+#### 포트 자동 연계 · dev:all
+
+- **What:** `npm run dev:all` / `scripts/dev-all.ps1` — postgres + platform(:3000) + OpenCode(:4096) + web(:5173) + chamber(:3001). Chamber는 `OPENCODE_SKIP_START`로 **단일 OpenCode :4096** 공유. `/api/stack` 포트 맵, 포털 실시간 상태.
+- **Why:** 수동 포트 맞추기 없이 로컬 풀스택 기동.
+- **Status:** done (chamber log: external OpenCode 4096)
+
 ### 이전 완료 (MVP)
 
 | 커밋 | 내용 |

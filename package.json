@@ -6,13 +6,14 @@
   ],
   "scripts": {
     "dev": "concurrently -n server,web -c blue,green \"npm run dev -w @vibe/server\" \"npm run dev -w @vibe/web\"",
+    "dev:all": "powershell -NoProfile -ExecutionPolicy Bypass -File scripts/dev-all.ps1",
     "dev:server": "npm run dev -w @vibe/server",
     "dev:web": "npm run dev -w @vibe/web",
     "db:up": "docker compose up -d postgres",
     "db:down": "docker compose down",
     "db:logs": "docker compose logs -f postgres",
-    "vendor:openchamber": "pwsh -File scripts/fetch-openchamber.ps1",
-    "chamber": "pwsh -File scripts/start-openchamber.ps1",
+    "vendor:openchamber": "powershell -NoProfile -ExecutionPolicy Bypass -File scripts/fetch-openchamber.ps1",
+    "chamber": "powershell -NoProfile -ExecutionPolicy Bypass -File scripts/start-openchamber.ps1",
     "test": "npm run test -w @vibe/server",
     "build": "npm run build -w @vibe/server && npm run build -w @vibe/web"
   },

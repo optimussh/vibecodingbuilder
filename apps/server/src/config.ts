@@ -35,9 +35,10 @@ export const config = {
   ragChunkOverlap: Number(process.env.RAG_CHUNK_OVERLAP ?? 150),
   embeddingModel: process.env.EMBEDDING_MODEL ?? "text-embedding-004",
   embeddingDims: 768,
-  /** Upstream OpenChamber web (optional) e.g. http://127.0.0.1:4097 */
-  openchamberUrl: process.env.OPENCHAMBER_URL ?? "",
-  openchamberEnabled: (process.env.OPENCHAMBER_ENABLED ?? "false") === "true",
+  /** Upstream OpenChamber web — local default :3001 */
+  openchamberUrl:
+    process.env.OPENCHAMBER_URL ?? "http://127.0.0.1:3001",
+  openchamberEnabled: (process.env.OPENCHAMBER_ENABLED ?? "true") === "true",
   /** Daily message quota per user (0 = unlimited) */
   dailyMessageQuota: Number(process.env.DAILY_MESSAGE_QUOTA ?? 200),
   passwords: {

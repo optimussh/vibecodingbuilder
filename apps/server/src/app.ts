@@ -14,6 +14,7 @@ import { ragRouter } from "./routes/rag.js";
 import { portalRouter } from "./routes/portal.js";
 import { loginPageRouter } from "./routes/loginPage.js";
 import { quotaRouter } from "./routes/quota.js";
+import { stackRouter } from "./routes/stack.js";
 import { proxyRouter, mountOpenChamberProxy } from "./routes/proxy.js";
 import * as sessionMap from "./sessionMap.js";
 import { ensureWorkspace } from "./workspace.js";
@@ -72,6 +73,7 @@ export function createApp(_options: CreateAppOptions = {}) {
   app.use("/api", workspaceRouter);
   app.use("/api", ragRouter);
   app.use("/api", quotaRouter);
+  app.use("/api", stackRouter);
 
   // Tenant-gated OpenCode reverse proxy
   app.use(proxyRouter);

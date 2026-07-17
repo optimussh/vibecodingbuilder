@@ -33,39 +33,43 @@ GEMINI_API_KEY=your-key-here
 SESSION_SECRET=any-long-random-string
 ```
 
-## 실행
+## 실행 (포트 자동 연계)
 
 ```bash
 npm install
-npm run db:up          # Postgres+pgvector (Docker, port 5433)
-# .env 에 GEMINI_API_KEY 입력 (임베딩: 키 없으면 local hash 폴백)
-npm run dev
+# .env 에 GEMINI_API_KEY (선택)
+npm run dev:all
 ```
 
-- **포털:** http://127.0.0.1:3000/  
-- **상태 보드:** http://127.0.0.1:3000/docs/status/index.html  
-- **레거시 UI:** http://localhost:5173  
-- **OpenChamber 프록시:** http://127.0.0.1:3000/chamber (업스트림 설정 시)  
-- **OpenCode 프록시:** `/opencode/*` (로그인 + workspace directory 강제)  
-- OpenCode 직접: `127.0.0.1:4096` (브라우저 직결 비권장)  
-- Postgres RAG: `127.0.0.1:5433`
+`dev:all` 이 한 번에 올립니다:
 
-### OpenChamber (선택, Windows는 WSL 권장)
+| 서비스 | 포트 | 역할 |
+|--------|------|------|
+| Postgres (pgvector) | 5433 | RAG |
+| Platform gateway | **3000** | 로그인·RAG·테넌트 프록시·포털 |
+| OpenCode | **4096** | 에이전트 엔진 (플랫폼이 기동) |
+| OpenChamber | **3001** | IDE UI (외부 OpenCode :4096 사용) |
+| Legacy Vite UI | **5173** | 채팅/RAG 패널 |
+
+**권장 진입:** http://127.0.0.1:3000/login?next=/chamber  
+
+- 포털/스택: http://127.0.0.1:3000/ · `/api/stack`  
+- 상태 보드: http://127.0.0.1:3000/docs/status/index.html  
+- 레거시 UI: http://localhost:5173  
+- Chamber 프록시: http://127.0.0.1:3000/chamber → `:3001`  
+- OpenCode 프록시: `/opencode/*` (로그인 + `directory` 강제)  
+
+배선: **Chamber → OpenCode :4096 (단일)** · **브라우저 → 항상 :3000 게이트웨이**
+
+핀 SHA: `vendor/openchamber.sha` · 스파이크: `docs/superpowers/specs/2026-07-17-openchamber-spike.md`
+
+### 개별 기동
 
 ```powershell
-pwsh scripts/fetch-openchamber.ps1
-# WSL 안에서:
-# cd vendor/openchamber && bun install && bun run dev:server   # :3001
+npm run db:up
+npm run dev          # platform + legacy only
+npm run chamber      # chamber only (waits for :4096)
 ```
-
-`.env`:
-
-```env
-OPENCHAMBER_ENABLED=true
-OPENCHAMBER_URL=http://127.0.0.1:3001
-```
-
-핀 SHA: `vendor/openchamber.sha` · 노트: `docs/superpowers/specs/2026-07-17-openchamber-spike.md`
 
 ### RAG 사용
 
