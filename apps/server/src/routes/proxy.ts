@@ -178,28 +178,53 @@ export function mountOpenChamberProxy(app: import("express").Express): void {
 function chamberLaunchHtml(target: string): string {
   return `<!doctype html>
 <html lang="ko"><head><meta charset="utf-8"/>
-<meta http-equiv="refresh" content="0;url=${target}"/>
-<title>OpenChamber 실행</title>
+<title>OpenChamber · workspace bind</title>
 <style>
-body{font-family:system-ui;background:#0c0d10;color:#e8eaed;padding:2rem;max-width:36rem;margin:auto;line-height:1.5}
+body{font-family:system-ui;background:#0c0d10;color:#e8eaed;padding:2rem;max-width:40rem;margin:auto;line-height:1.5}
 a{color:#7c9cff} .card{border:1px solid #2a2e38;background:#15171c;border-radius:12px;padding:1rem;margin:1rem 0}
-code{background:#0a0b0e;padding:.1rem .35rem;border-radius:4px}
+code,pre{background:#0a0b0e;padding:.15rem .4rem;border-radius:4px;font-size:.85rem}
+pre{padding:.75rem;overflow:auto;white-space:pre-wrap}
 .muted{color:#9aa0a6;font-size:.9rem}
+button{background:#4f6ef7;color:#fff;border:0;padding:.55rem 1rem;border-radius:8px;cursor:pointer;font-weight:600}
 </style></head>
 <body>
-  <h1>OpenChamber로 이동 중…</h1>
-  <p class="muted">경로 프록시(<code>/chamber</code>)는 SPA 정적 파일을 깨뜨려 채팅이 안 보입니다.
-  로컬에서는 <strong>직접 포트 :3001</strong> 로 엽니다.</p>
+  <h1>워크스페이스 연결 중…</h1>
+  <p class="muted">유저 전용 폴더를 준비한 뒤 OpenChamber(:3001)로 이동합니다.
+  (경로 프록시는 SPA 자산을 깨뜨리므로 직접 포트를 엽니다.)</p>
+  <div class="card" id="status">bind 호출 중…</div>
   <div class="card">
-    <p><a href="${target}"><strong>OpenChamber 열기 →</strong></a> <code>${target}</code></p>
-    <p class="muted">안 뜨면 터미널에서 <code>npm run chamber</code> 후 다시 시도.</p>
+    <p><a id="open" href="${target}"><strong>OpenChamber 열기 →</strong></a></p>
+    <p class="muted">Chamber에서 프로젝트로 이 폴더를 여세요 (아래 경로).</p>
+    <pre id="ws">…</pre>
+    <button type="button" onclick="navigator.clipboard.writeText(document.getElementById('ws').textContent)">경로 복사</button>
   </div>
   <div class="card">
-    <p><strong>채팅이 필요하면 (레거시 UI)</strong></p>
-    <p><a href="http://127.0.0.1:5173/">http://127.0.0.1:5173/</a> — 로그인 후 세션 목록·입력창이 바로 보입니다.</p>
+    <p><strong>빠른 채팅 (레거시)</strong></p>
+    <p><a href="http://127.0.0.1:5173/">http://127.0.0.1:5173/</a></p>
   </div>
   <p><a href="/">← 포털</a></p>
-  <script>location.replace(${JSON.stringify(target)});</script>
+  <script>
+    (async () => {
+      const target = ${JSON.stringify(target)};
+      try {
+        const r = await fetch('/api/workspace/bind', {
+          method: 'POST', credentials: 'include',
+          headers: { 'Content-Type': 'application/json' }, body: '{}'
+        });
+        const data = await r.json();
+        if (!r.ok) throw new Error(data.error || 'bind failed');
+        document.getElementById('status').textContent =
+          '연결됨 · session=' + (data.sessionId || 'none') + ' · OpenCode directory 고정';
+        document.getElementById('ws').textContent = data.workspace || '';
+        // Open Chamber after short delay so user can read path
+        setTimeout(() => { location.href = target; }, 600);
+      } catch (e) {
+        document.getElementById('status').textContent = 'bind 실패: ' + e.message + ' — Chamber는 직접 엽니다.';
+        document.getElementById('ws').textContent = '(워크스페이스 경로를 포털에서 확인)';
+        setTimeout(() => { location.href = target; }, 1200);
+      }
+    })();
+  </script>
 </body></html>`;
 }
 

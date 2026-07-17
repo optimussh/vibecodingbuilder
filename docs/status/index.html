@@ -163,20 +163,40 @@
       </ul>
     </div>
 
-    <h2>앞으로 (로컬 남은 것)</h2>
+    <h2>이번에 추가된 것</h2>
+    <div class="grid two">
+      <div class="card">
+        <h3><span class="badge ok">완료</span> workspace bind</h3>
+        <p class="why"><strong>왜:</strong> 로그인/Chamber 시 유저 폴더 고정 + OC 세션 directory.</p>
+        <div class="path">POST /api/workspace/bind · data/workspaces/{user}</div>
+      </div>
+      <div class="card">
+        <h3><span class="badge ok">완료</span> Postgres 세션·감사</h3>
+        <p class="why"><strong>왜:</strong> 재시작 후에도 소유권·감사 추적 (파일 폴백).</p>
+        <div class="path">agent_sessions · audit_events</div>
+      </div>
+      <div class="card">
+        <h3><span class="badge ok">완료</span> 앱 미리보기</h3>
+        <p class="why"><strong>왜:</strong> 워크스페이스에서 만든 앱을 로컬로 바로 확인.</p>
+        <div class="path">POST /api/preview/start · /preview/app/</div>
+      </div>
+    </div>
+
+    <h2>앞으로 (로컬 외 / 선택)</h2>
     <div class="card">
       <ol>
-        <li>OC UI 프로젝트 기본 경로 = 유저 workspace 자동 매핑 강화</li>
-        <li>세션/감사 Postgres 통합</li>
-        <li>(선택) 앱 미리보기 · Docker 유저 격리</li>
+        <li>Docker per-user OS 격리</li>
+        <li>LDAP/SSO · 사내 PaaS 배포</li>
+        <li>Chamber SPA base-path 정식 서브패스 호스팅</li>
       </ol>
     </div>
 
     <h2>히스토리</h2>
     <div class="card">
       <ul>
-        <li>2026-07-17 — 포트 자동 연계 (dev:all, Chamber→OC:4096 단일)</li>
-        <li>2026-07-17 — MVP 0/1/3 · OpenChamber 프록시 · 게이트웨이 P0–P3</li>
+        <li>2026-07-17 — workspace bind · PG 세션/감사 · preview</li>
+        <li>2026-07-17 — 포트 자동 연계 · 채팅 빈 화면 수정</li>
+        <li>2026-07-17 — MVP · OpenChamber · 게이트웨이</li>
       </ul>
     </div>
 

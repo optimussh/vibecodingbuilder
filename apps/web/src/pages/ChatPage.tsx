@@ -91,11 +91,38 @@ export function ChatPage() {
         <div className="flex items-center gap-3 text-sm">
           <button
             type="button"
+            onClick={() =>
+              void api.workspaceBind().then((b) => {
+                window.open(b.chamberUrl, "_blank");
+                if (b.workspace) {
+                  void navigator.clipboard?.writeText(b.workspace);
+                }
+              })
+            }
+            className="text-xs text-indigo-400 hover:text-indigo-300"
+            title="워크스페이스 bind 후 OpenChamber 열기"
+          >
+            Chamber
+          </button>
+          <button
+            type="button"
+            onClick={() =>
+              void api.previewStart().then((p) => {
+                window.open(p.url || p.direct, "_blank");
+              })
+            }
+            className="text-xs text-emerald-400 hover:text-emerald-300"
+            title="워크스페이스 앱 미리보기"
+          >
+            Preview
+          </button>
+          <button
+            type="button"
             onClick={reset}
             title="패널 너비 기본값으로 초기화"
             className="text-xs text-zinc-500 hover:text-zinc-300"
           >
-            레이아웃 초기화
+            레이아웃
           </button>
           {user?.role === "admin" && (
             <Link to="/admin" className="text-indigo-400 hover:text-indigo-300">

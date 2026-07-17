@@ -61,6 +61,15 @@ npm run dev:all
 
 배선: **Chamber → OpenCode :4096 (단일)** · **브라우저 → 항상 :3000 게이트웨이**
 
+### 주요 API (로컬)
+
+| API | 설명 |
+|-----|------|
+| `POST /api/workspace/bind` | 유저 워크스페이스 준비 + OC 세션 directory 고정 |
+| `POST /api/preview/start` | 워크스페이스 앱 미리보기 스폰 |
+| `GET /preview/app/` | 미리보기 리버스 프록시 (로그인 필요) |
+| `GET /api/stack` | 포트·서비스 상태 맵 |
+
 핀 SHA: `vendor/openchamber.sha` · 스파이크: `docs/superpowers/specs/2026-07-17-openchamber-spike.md`
 
 ### 개별 기동

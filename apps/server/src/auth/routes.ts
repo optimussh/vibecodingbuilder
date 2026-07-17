@@ -1,9 +1,8 @@
 import { Router } from "express";
 import { findUser, verifyPassword } from "../users.js";
-import { ensureWorkspace } from "../workspace.js";
-import { config } from "../config.js";
 import { appendAudit } from "../audit.js";
 import { requireAuth } from "./requireAuth.js";
+import { bootstrapUserWorkspace } from "../workspaceBootstrap.js";
 
 export const authRouter = Router();
 
@@ -18,11 +17,11 @@ authRouter.post("/login", (req, res) => {
     return;
   }
 
-  ensureWorkspace(config.workspacesRoot, user.username);
+  const workspace = bootstrapUserWorkspace(user.username);
   req.session.user = { username: user.username, role: user.role };
-  appendAudit("login", user.username);
+  appendAudit("login", user.username, { workspace });
 
-  res.json({ username: user.username, role: user.role });
+  res.json({ username: user.username, role: user.role, workspace });
 });
 
 authRouter.post("/logout", requireAuth, (req, res) => {

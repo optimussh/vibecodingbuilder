@@ -10,14 +10,16 @@ import { fsRouter } from "./routes/fs.js";
 import { eventsRouter } from "./routes/events.js";
 import { adminRouter } from "./routes/admin.js";
 import { workspaceRouter } from "./routes/workspace.js";
+import { workspaceBindRouter } from "./routes/workspaceBind.js";
 import { ragRouter } from "./routes/rag.js";
 import { portalRouter } from "./routes/portal.js";
 import { loginPageRouter } from "./routes/loginPage.js";
 import { quotaRouter } from "./routes/quota.js";
 import { stackRouter } from "./routes/stack.js";
+import { previewRouter, mountPreviewProxy } from "./routes/preview.js";
 import { proxyRouter, mountOpenChamberProxy } from "./routes/proxy.js";
 import * as sessionMap from "./sessionMap.js";
-import { ensureWorkspace } from "./workspace.js";
+import { bootstrapUserWorkspace } from "./workspaceBootstrap.js";
 import { config } from "./config.js";
 import { publicUserList } from "./users.js";
 
@@ -28,7 +30,7 @@ export interface CreateAppOptions {
 export function createApp(_options: CreateAppOptions = {}) {
   sessionMap.loadFromDisk();
   for (const u of publicUserList()) {
-    ensureWorkspace(config.workspacesRoot, u.username);
+    bootstrapUserWorkspace(u.username);
   }
 
   const app = express();
@@ -40,6 +42,8 @@ export function createApp(_options: CreateAppOptions = {}) {
         "http://127.0.0.1:5173",
         "http://localhost:3000",
         "http://127.0.0.1:3000",
+        "http://localhost:3001",
+        "http://127.0.0.1:3001",
       ],
       credentials: true,
     }),
@@ -48,7 +52,6 @@ export function createApp(_options: CreateAppOptions = {}) {
   app.use(cookieParser());
   app.use(createSessionMiddleware());
 
-  // Status board (static)
   app.use(
     "/docs/status",
     express.static(path.join(config.projectRoot, "docs/status")),
@@ -71,15 +74,16 @@ export function createApp(_options: CreateAppOptions = {}) {
   app.use("/api", eventsRouter);
   app.use("/api", adminRouter);
   app.use("/api", workspaceRouter);
+  app.use("/api", workspaceBindRouter);
   app.use("/api", ragRouter);
   app.use("/api", quotaRouter);
   app.use("/api", stackRouter);
+  app.use("/api", previewRouter);
 
-  // Tenant-gated OpenCode reverse proxy
   app.use(proxyRouter);
   mountOpenChamberProxy(app);
+  mountPreviewProxy(app);
 
-  // HTML login + portal
   app.use(loginPageRouter);
   app.use(portalRouter);
 

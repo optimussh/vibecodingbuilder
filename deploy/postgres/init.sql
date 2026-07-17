@@ -1,4 +1,4 @@
--- Phase 3 RAG (local mini)
+-- Phase 3 RAG + platform state (local)
 CREATE EXTENSION IF NOT EXISTS vector;
 
 CREATE TABLE IF NOT EXISTS documents (
@@ -25,7 +25,6 @@ CREATE TABLE IF NOT EXISTS chunks (
 CREATE INDEX IF NOT EXISTS chunks_username_idx ON chunks (username);
 CREATE INDEX IF NOT EXISTS chunks_document_id_idx ON chunks (document_id);
 
--- cosine distance search (created after some rows may exist; IF NOT EXISTS for HNSW needs pg16+)
 DO $$
 BEGIN
   IF NOT EXISTS (
@@ -37,6 +36,25 @@ BEGIN
   END IF;
 EXCEPTION
   WHEN others THEN
-    -- HNSW may fail on empty table in some versions; create later
     RAISE NOTICE 'hnsw index skipped: %', SQLERRM;
 END $$;
+
+-- Platform: agent session ownership
+CREATE TABLE IF NOT EXISTS agent_sessions (
+  session_id TEXT PRIMARY KEY,
+  username TEXT NOT NULL,
+  workspace TEXT NOT NULL,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+CREATE INDEX IF NOT EXISTS agent_sessions_username_idx ON agent_sessions (username);
+
+-- Platform: audit log
+CREATE TABLE IF NOT EXISTS audit_events (
+  id BIGSERIAL PRIMARY KEY,
+  ts TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  action TEXT NOT NULL,
+  username TEXT,
+  meta JSONB
+);
+CREATE INDEX IF NOT EXISTS audit_events_ts_idx ON audit_events (ts DESC);
+CREATE INDEX IF NOT EXISTS audit_events_username_idx ON audit_events (username);

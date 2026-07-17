@@ -53,6 +53,17 @@
 - **Why:** “로그인만 되고 채팅창 없음” 은 버그였음 (정상 아님).
 - **Status:** done
 
+#### 로컬 잔여 일괄 (workspace bind · PG · preview)
+
+- **What:**
+  - `POST /api/workspace/bind` — 유저 워크스페이스 bootstrap (`.vibe.json`, `AGENTS.md`) + OpenCode 세션 directory 고정
+  - Chamber 런치 시 bind 후 :3001 이동 + 경로 안내
+  - `agent_sessions` / `audit_events` Postgres 이중 기록 (파일 폴백)
+  - 앱 미리보기: `POST /api/preview/start` · `/preview/app/` 프록시 (workspace dev 서버 스폰)
+  - 포털/채팅 UI Chamber·Preview 버튼
+- **Why:** 남은 로컬 가능 작업(연결·영속·미리보기) 일괄 완료
+- **Status:** done
+
 ### 이전 완료 (MVP)
 
 | 커밋 | 내용 |

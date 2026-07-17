@@ -190,4 +190,38 @@ export const api = {
       body: JSON.stringify({ query, topK }),
     });
   },
+  workspaceBind() {
+    return request<{
+      username: string;
+      workspace: string;
+      sessionId: string | null;
+      chamberUrl: string;
+      openInstructions: string;
+    }>("/api/workspace/bind", {
+      method: "POST",
+      body: JSON.stringify({}),
+    });
+  },
+  previewStart() {
+    return request<{
+      running: boolean;
+      port: number;
+      url: string;
+      direct: string;
+    }>("/api/preview/start", {
+      method: "POST",
+      body: JSON.stringify({}),
+    });
+  },
+  previewStop() {
+    return request<{ ok: boolean }>("/api/preview/stop", { method: "POST" });
+  },
+  previewStatus() {
+    return request<{
+      running: boolean;
+      port?: number;
+      url?: string;
+      direct?: string;
+    }>("/api/preview");
+  },
 };
