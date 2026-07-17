@@ -12,6 +12,7 @@
     "db:down": "docker compose down",
     "db:logs": "docker compose logs -f postgres",
     "vendor:openchamber": "pwsh -File scripts/fetch-openchamber.ps1",
+    "chamber": "pwsh -File scripts/start-openchamber.ps1",
     "test": "npm run test -w @vibe/server",
     "build": "npm run build -w @vibe/server && npm run build -w @vibe/web"
   },

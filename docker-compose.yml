@@ -18,5 +18,23 @@ services:
       timeout: 5s
       retries: 10
 
+  # Optional: run platform BFF in container (OpenCode still on host recommended on Windows)
+  # platform:
+  #   build:
+  #     context: .
+  #     dockerfile: deploy/Dockerfile.platform
+  #   ports:
+  #     - "3000:3000"
+  #   env_file: .env
+  #   environment:
+  #     DATABASE_URL: postgres://vibe:vibe@postgres:5432/vibe
+  #     OPENCODE_MANAGED: "false"
+  #     OPENCODE_BASE_URL: http://host.docker.internal:4096
+  #   depends_on:
+  #     postgres:
+  #       condition: service_healthy
+  #   volumes:
+  #     - ./data:/app/data
+
 volumes:
   vibe_pgdata:

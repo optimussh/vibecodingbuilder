@@ -32,17 +32,16 @@ portalRouter.get("/", (req, res) => {
       user
         ? `<p>로그인: <strong>${user.username}</strong> (${user.role})
            ${q ? ` · 오늘 메시지 ${q.used}/${q.limit || "∞"}` : ""}</p>
-           <form method="post" action="/api/auth/logout" onsubmit="event.preventDefault();fetch('/api/auth/logout',{method:'POST',credentials:'include'}).then(()=>location.reload())">
-             <button type="submit">Logout</button>
-           </form>`
-        : `<p class="muted">API 로그인: <code>POST /api/auth/login</code> 또는 레거시 UI 사용</p>`
+           <button onclick="fetch('/api/auth/logout',{method:'POST',credentials:'include'}).then(()=>location.reload())">Logout</button>`
+        : `<p class="muted"><a href="/login">로그인 페이지</a> · admin/user1/user2</p>`
     }
     <a class="card" href="http://localhost:5173"><strong>레거시 앱 UI</strong><br/><span class="muted">채팅 · 파일 · RAG · 리사이즈 패널 (현재 기본 제품 셸)</span></a>
     <a class="card" href="/chamber"><strong>OpenChamber 셸</strong><br/><span class="muted">${
       config.openchamberEnabled && config.openchamberUrl
         ? "게이트웨이 프록시 연결됨 (로그인 필요)"
-        : "업스트림 미연결 — 설정 안내 페이지"
+        : "업스트림 미연결 — scripts/start-openchamber.ps1 후 OPENCHAMBER_ENABLED=true"
     }</span></a>
+    <a class="card" href="/login?next=/chamber"><strong>로그인 후 Chamber</strong><br/><span class="muted">/login → /chamber</span></a>
     <a class="card" href="/docs/status/index.html"><strong>진행 현황 보드</strong><br/><span class="muted">기능 · 왜 넣었는지 · 다음 방향</span></a>
     <a class="card" href="/api/health"><strong>Health JSON</strong><br/><span class="muted">opencode / llm / rag</span></a>
     <p class="muted">계정: admin/admin123 · user1/user1 · user2/user2</p>

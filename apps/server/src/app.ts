@@ -12,6 +12,7 @@ import { adminRouter } from "./routes/admin.js";
 import { workspaceRouter } from "./routes/workspace.js";
 import { ragRouter } from "./routes/rag.js";
 import { portalRouter } from "./routes/portal.js";
+import { loginPageRouter } from "./routes/loginPage.js";
 import { quotaRouter } from "./routes/quota.js";
 import { proxyRouter, mountOpenChamberProxy } from "./routes/proxy.js";
 import * as sessionMap from "./sessionMap.js";
@@ -76,7 +77,8 @@ export function createApp(_options: CreateAppOptions = {}) {
   app.use(proxyRouter);
   mountOpenChamberProxy(app);
 
-  // Portal home
+  // HTML login + portal
+  app.use(loginPageRouter);
   app.use(portalRouter);
 
   return app;

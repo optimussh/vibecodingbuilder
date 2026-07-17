@@ -35,6 +35,12 @@
 - **Why:** 거버넌스 미니 + 프로덕션 로컬 1.0 체크리스트.
 - **Status:** done (로컬 1.0 플랫폼 측)
 
+#### P3+ — OpenChamber 실기동 연결 (Windows)
+
+- **What:** `bun install --ignore-scripts` + `build:ui`/`build:web` 성공, OpenChamber `:3001` 기동, 게이트웨이 `/chamber` 프록시 200, `/login` HTML, `/opencode` 테넌트 프록시 health, `scripts/start-openchamber.ps1`.
+- **Why:** 프로덕션 셸을 레거시 UI만이 아니라 OpenChamber로도 진입 가능하게.
+- **Status:** done (스모크: chamber HTML 200, opencode proxy healthy, 비로그인 401)
+
 ### 이전 완료 (MVP)
 
 | 커밋 | 내용 |

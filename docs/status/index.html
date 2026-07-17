@@ -70,15 +70,14 @@
     <h2>지금 어디?</h2>
     <div class="card">
       <p>
-        <span class="badge ok">로컬 1.0 플랫폼</span>
-        P0–P3 게이트웨이·격리·쿼터·문서 완료 · OpenChamber UI는 업스트림 기동 시 연결
+        <span class="badge ok">로컬 1.0 + OpenChamber</span>
+        게이트웨이·격리·쿼터·RAG + OpenChamber UI 프록시 연결 검증됨
       </p>
       <div class="phase">
         <span class="done">MVP 채팅·격리·RAG</span>
-        <span class="done">P0 문서·벤더 핀</span>
-        <span class="done">P1 포털·/chamber</span>
-        <span class="done">P2 /opencode 테넌트 프록시</span>
-        <span class="done">P3 쿼터·상태보드</span>
+        <span class="done">P0–P3 게이트웨이</span>
+        <span class="done">OpenChamber :3001 빌드·기동</span>
+        <span class="done">/chamber 프록시 200</span>
       </div>
       <p><strong>로컬 URL</strong></p>
       <ul>
@@ -123,23 +122,30 @@
         <div class="path">quota.ts · GET /api/quota</div>
       </div>
       <div class="card">
-        <h3><span class="badge warn">조건부</span> OpenChamber 풀 UI</h3>
+        <h3><span class="badge ok">완료</span> OpenChamber 풀 UI (프록시)</h3>
         <p class="why">
-          <strong>왜:</strong> IDE급 diff/터미널 UX.
-          <strong>제약:</strong> Windows에서 sharp 네이티브 빌드(VS C++) 필요 — WSL 또는 Build Tools 권장.
-          핀: <code>vendor/openchamber.sha</code>
+          <strong>왜:</strong> IDE급 diff/터미널/세션 UX.
+          Windows: <code>bun install --ignore-scripts</code> + 빌드 후
+          <code>bun server/index.js --port 3001</code>.
+          진입: 로그인 → <code>/chamber</code>
         </p>
-        <div class="path">vendor/openchamber · scripts/fetch-openchamber.ps1</div>
+        <div class="path">scripts/start-openchamber.ps1 · OPENCHAMBER_*=.env</div>
+      </div>
+      <div class="card">
+        <h3><span class="badge ok">완료</span> HTML 로그인 /login</h3>
+        <p class="why"><strong>왜:</strong> Chamber·포털을 레거시 UI 없이 쓸 수 있게.</p>
+        <div class="path">apps/server/src/routes/loginPage.ts</div>
       </div>
     </div>
 
-    <h2>OpenChamber 켜는 법 (선택)</h2>
+    <h2>OpenChamber 켜는 법</h2>
     <div class="card">
       <ol>
         <li><code>pwsh scripts/fetch-openchamber.ps1</code></li>
-        <li>WSL 권장: <code>cd vendor/openchamber &amp;&amp; bun install &amp;&amp; bun run dev:server</code> (포트 3001)</li>
+        <li><code>cd vendor/openchamber; bun install --ignore-scripts; bun run build:ui; bun run build:web</code></li>
+        <li><code>pwsh scripts/start-openchamber.ps1</code> 또는 <code>bun server/index.js --port 3001</code> (packages/web)</li>
         <li><code>.env</code>: <code>OPENCHAMBER_ENABLED=true</code> · <code>OPENCHAMBER_URL=http://127.0.0.1:3001</code></li>
-        <li>게이트웨이 재시작 → 로그인 후 <code>/chamber</code></li>
+        <li><code>npm run dev</code> → <a href="http://127.0.0.1:3000/login?next=/chamber">로그인 후 Chamber</a></li>
       </ol>
     </div>
 

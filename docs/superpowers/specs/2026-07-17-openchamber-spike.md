@@ -40,11 +40,20 @@ bun install
 - Recommended for full OpenChamber: **WSL2 Ubuntu** or install VS Build Tools + “Desktop development with C++”.
 - `node-pty` / terminal features may need WSL if native build fails — degrade gracefully.
 
-## Go / no-go
+## Go / no-go (updated after Windows build)
 
 | Item | Result |
 |------|--------|
 | Clone + pin SHA | **GO** |
-| Gateway `/chamber` proxy + auth | **GO** (code path ready) |
-| Full Windows native OC install | **NO-GO** without VS Build Tools / WSL |
-| Proceed P1–P3 on platform + optional OC | **GO** |
+| `bun install --ignore-scripts` | **GO** |
+| `build:ui` / `build:web` | **GO** (dist produced) |
+| OpenChamber listen `:3001` | **GO** |
+| Gateway `/chamber` proxy + auth | **GO** (HTML 200 after login) |
+| Full `bun install` with sharp scripts | **NO-GO** without VS C++ (use --ignore-scripts) |
+| Proceed production local | **GO** |
+
+### Verified smoke (2026-07-17)
+
+- `GET /chamber/` + session cookie → 200 HTML  
+- `GET /opencode/global/health` without cookie → 401  
+- with cookie → OpenCode healthy
