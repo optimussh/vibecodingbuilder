@@ -23,6 +23,15 @@
 - **Why:** 코드네임 `vibecodingbuilder` 정리 + 셀링 방향 문서화
 - **Status:** done
 
+### P1 상세 스펙 · 파일럿 세일즈 키트 · 로컬 경로
+
+- **What:**
+  - P1 스펙 분리: `p1-admin-sso`, `p1-project-sandbox`, `p1-audit-usage`
+  - 파일럿 SoW + 15분 데모 스크립트 (`docs/sales/`)
+  - 로컬 `codeharbor` junction (잠금 시 완전 rename 대체)
+- **Why:** 구현·파일럿 착수 가능 상태
+- **Status:** done
+
 ---
 
 ## 2026-07-17

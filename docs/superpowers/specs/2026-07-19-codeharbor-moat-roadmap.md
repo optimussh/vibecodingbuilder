@@ -314,14 +314,15 @@ apps/server/src/runtime/
 
 ---
 
-## 11. 다음 문서 (파생 스펙)
+## 11. 파생 문서 (작성됨)
 
 | 문서 | 내용 |
 |------|------|
-| `...-p1-admin-sso.md` | OIDC 플로우, 스키마, UI wire |
-| `...-p1-project-sandbox.md` | Project ACL, docker 런타임 |
-| `...-p1-audit-usage.md` | 이벤트 카탈로그, 비용 산식 |
-| `...-security-onepager.md` | 고객 제출용 |
+| [p1-admin-sso](./2026-07-19-p1-admin-sso.md) | OIDC, Admin, credential vault |
+| [p1-project-sandbox](./2026-07-19-p1-project-sandbox.md) | Project ACL, Docker sandbox v1 |
+| [p1-audit-usage](./2026-07-19-p1-audit-usage.md) | 감사 export, usage/cost meter |
+| [pilot-sow](../../sales/pilot-sow.md) | 파일럿 SoW 템플릿 |
+| [demo-15min](../../sales/demo-15min.md) | 15분 데모 스크립트 |
 
 ---
 

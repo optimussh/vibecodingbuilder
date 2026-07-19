@@ -90,8 +90,17 @@ npm run e2e:gemini
 npm run e2e:gemini:live   # 실제 키 필요
 ```
 
-## 전략 문서
+## 전략 · P1 · 세일즈 문서
 
-- 브랜드: `docs/BRAND.md`
-- **해자 · 독립영역 · 로드맵 · P1 스펙 골격:** `docs/superpowers/specs/2026-07-19-codeharbor-moat-roadmap.md`
-- 진행: `PROGRESS.md` · `docs/status/index.html`
+| 문서 | 경로 |
+|------|------|
+| 브랜드 | `docs/BRAND.md` |
+| 해자 · 로드맵 | `docs/superpowers/specs/2026-07-19-codeharbor-moat-roadmap.md` |
+| P1 Admin + SSO | `docs/superpowers/specs/2026-07-19-p1-admin-sso.md` |
+| P1 Project + Sandbox | `docs/superpowers/specs/2026-07-19-p1-project-sandbox.md` |
+| P1 Audit + Usage | `docs/superpowers/specs/2026-07-19-p1-audit-usage.md` |
+| 파일럿 SoW | `docs/sales/pilot-sow.md` |
+| 15분 데모 스크립트 | `docs/sales/demo-15min.md` |
+| 진행 보드 | `PROGRESS.md` · `docs/status/index.html` |
+
+로컬 경로: `…/00.ProjectsSRC/codeharbor` (junction) · GitHub: `optimussh/codeharbor`

@@ -229,18 +229,45 @@
       </div>
     </div>
 
-    <h2>앞으로 (로컬 외 / 선택)</h2>
+    <h2>P1 · 세일즈 문서</h2>
+    <div class="grid two">
+      <div class="card">
+        <h3><span class="badge ok">스펙</span> P1 Admin + SSO</h3>
+        <p class="why">OIDC · credential vault · admin API/UI</p>
+        <div class="path">docs/superpowers/specs/2026-07-19-p1-admin-sso.md</div>
+      </div>
+      <div class="card">
+        <h3><span class="badge ok">스펙</span> P1 Project + Sandbox</h3>
+        <p class="why">프로젝트 ACL · Docker sandbox v1</p>
+        <div class="path">docs/superpowers/specs/2026-07-19-p1-project-sandbox.md</div>
+      </div>
+      <div class="card">
+        <h3><span class="badge ok">스펙</span> P1 Audit + Usage</h3>
+        <p class="why">감사 export · 토큰/비용 추정</p>
+        <div class="path">docs/superpowers/specs/2026-07-19-p1-audit-usage.md</div>
+      </div>
+      <div class="card">
+        <h3><span class="badge ok">세일즈</span> Pilot SoW · 15분 데모</h3>
+        <p class="why">8주 파일럿 계약 템플릿 + 데모 스크립트</p>
+        <div class="path">docs/sales/pilot-sow.md · demo-15min.md</div>
+      </div>
+    </div>
+
+    <h2>앞으로 (구현 우선)</h2>
     <div class="card">
       <ol>
-        <li>Docker per-user OS 격리</li>
-        <li>LDAP/SSO · 사내 PaaS 배포</li>
-        <li>.env 에 실제 GEMINI_API_KEY 후 실에이전트·임베딩 품질 검증 (<code>npm run e2e:gemini:live</code>)</li>
+        <li>P1.2 Admin + credential vault 구현</li>
+        <li>P1.1 SSO OIDC</li>
+        <li>P1.3 Project ACL → P1.4 Sandbox → P1.5/6 Audit·Usage</li>
+        <li>.env GEMINI_API_KEY · <code>npm run e2e:gemini:live</code></li>
+        <li>로컬 폴더 완전 rename (IDE 종료 후 <code>scripts/rename-folder-to-codeharbor.ps1</code>)</li>
       </ol>
     </div>
 
     <h2>히스토리</h2>
     <div class="card">
       <ul>
+        <li>2026-07-19 — P1 상세 스펙 3종 · Pilot SoW · 15분 데모 · codeharbor junction</li>
         <li>2026-07-19 — 폴더/패키지 codeharbor 통일 · 해자·로드맵 스펙</li>
         <li>2026-07-19 — 제품명 CodeHarbor 확정 · 표시 브랜딩</li>
         <li>2026-07-19 — Chamber 자동 오픈 · Diff 구조 뷰 · e2e:gemini · quiet tests</li>

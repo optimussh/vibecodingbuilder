@@ -34,3 +34,11 @@ Yes: multi-user gateway, workspace isolation, BFF (keys never in browser), audit
 ## Related docs
 
 - Moat & roadmap: [`docs/superpowers/specs/2026-07-19-codeharbor-moat-roadmap.md`](superpowers/specs/2026-07-19-codeharbor-moat-roadmap.md)
+- P1 specs: admin-sso · project-sandbox · audit-usage (same folder)
+- Sales: [`docs/sales/pilot-sow.md`](sales/pilot-sow.md) · [`docs/sales/demo-15min.md`](sales/demo-15min.md)
+
+## Local path
+
+- Preferred: `C:\Users\user\00.ProjectsSRC\codeharbor`  
+  (junction to legacy `vibecodingbuilder` until full rename unlocks)
+- GitHub: https://github.com/optimussh/codeharbor
