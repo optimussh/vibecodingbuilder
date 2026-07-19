@@ -6,6 +6,7 @@ import { opencodeFetch, parseJsonBody, sessionIdOf } from "../opencode/http.js";
 import { checkOpencodeHealth } from "../opencode/client.js";
 import * as sessionMap from "../sessionMap.js";
 import { appendAudit } from "../audit.js";
+import { buildChamberOpenPath, buildChamberOpenUrl } from "../chamberUrl.js";
 
 export const workspaceBindRouter = Router();
 
@@ -17,7 +18,15 @@ workspaceBindRouter.post("/workspace/bind", requireAuth, async (req, res) => {
   let session: unknown = null;
   let sessionId: string | undefined;
 
-  if ((await checkOpencodeHealth()) === "up") {
+  // Reuse latest claimed session for this user when present
+  const existing = sessionMap
+    .listRecordsByUser(username)
+    .sort((a, b) => String(b.createdAt || "").localeCompare(String(a.createdAt || "")))[0];
+  if (existing?.id) {
+    sessionId = existing.id;
+  }
+
+  if (!sessionId && (await checkOpencodeHealth()) === "up") {
     try {
       const created = await opencodeFetch("/session", {
         method: "POST",
@@ -41,20 +50,34 @@ workspaceBindRouter.post("/workspace/bind", requireAuth, async (req, res) => {
 
   appendAudit("workspace.bind", username, { workspace, sessionId });
 
-  const chamberBase = (config.openchamberUrl || "http://127.0.0.1:3001").replace(
+  const chamberDirect = (config.openchamberUrl || "http://127.0.0.1:3001").replace(
     /\/$/,
     "",
   );
+  const chamberUrl = buildChamberOpenUrl({
+    workspace,
+    sessionId,
+    viaGateway: true,
+  });
+  const chamberPath = buildChamberOpenPath({ workspace, sessionId });
+  const chamberDirectUrl = buildChamberOpenUrl({
+    workspace,
+    sessionId,
+    viaGateway: false,
+  });
 
   res.json({
     username,
     workspace,
     sessionId: sessionId ?? null,
     session,
-    /** OpenChamber opens at root; open project via OpenCode directory already set on session */
-    chamberUrl: chamberBase,
-    /** Hint path for manual "Open project" in Chamber */
-    openInstructions: `In OpenChamber, open project folder:\n${workspace}`,
+    /** Preferred: platform gateway subpath with auto-open query params */
+    chamberUrl,
+    chamberPath,
+    /** Direct OpenChamber origin (bypass gateway) with same params */
+    chamberDirectUrl,
+    chamberBase: chamberDirect,
+    openInstructions: `Auto-open URL:\n${chamberUrl}\n\nIf the project did not open, use Open folder:\n${workspace}`,
     legacyChatUrl: "http://127.0.0.1:5173/",
   });
 });
@@ -62,13 +85,22 @@ workspaceBindRouter.post("/workspace/bind", requireAuth, async (req, res) => {
 workspaceBindRouter.get("/workspace/bind", requireAuth, (req, res) => {
   const username = req.session.user!.username;
   const workspace = bootstrapUserWorkspace(username);
+  const sessions = sessionMap.listRecordsByUser(username);
+  const latest = sessions.sort((a, b) =>
+    String(b.createdAt || "").localeCompare(String(a.createdAt || "")),
+  )[0];
   res.json({
     username,
     workspace,
-    chamberUrl: (config.openchamberUrl || "http://127.0.0.1:3001").replace(
-      /\/$/,
-      "",
-    ),
-    sessions: sessionMap.listRecordsByUser(username),
+    chamberUrl: buildChamberOpenUrl({
+      workspace,
+      sessionId: latest?.id,
+      viaGateway: true,
+    }),
+    chamberPath: buildChamberOpenPath({
+      workspace,
+      sessionId: latest?.id,
+    }),
+    sessions,
   });
 });

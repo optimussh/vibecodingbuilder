@@ -15,6 +15,8 @@
     "vendor:openchamber": "powershell -NoProfile -ExecutionPolicy Bypass -File scripts/fetch-openchamber.ps1",
     "chamber": "powershell -NoProfile -ExecutionPolicy Bypass -File scripts/start-openchamber.ps1",
     "test": "npm run test -w @vibe/server",
+    "e2e:gemini": "node scripts/e2e-gemini.mjs",
+    "e2e:gemini:live": "node scripts/e2e-gemini.mjs --live",
     "build": "npm run build -w @vibe/server && npm run build -w @vibe/web"
   },
   "devDependencies": {

@@ -202,6 +202,8 @@ export const api = {
       workspace: string;
       sessionId: string | null;
       chamberUrl: string;
+      chamberPath?: string;
+      chamberDirectUrl?: string;
       openInstructions: string;
     }>("/api/workspace/bind", {
       method: "POST",

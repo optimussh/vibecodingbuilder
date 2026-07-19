@@ -62,7 +62,7 @@
     <h1>Vibecoding Builder</h1>
     <p class="sub">
       로컬 AI 코딩 플랫폼 · OpenCode + OpenChamber 전환 · 멀티유저 · RAG<br />
-      갱신: <strong>2026-07-17</strong> · 원격:
+      갱신: <strong>2026-07-19</strong> · 원격:
       <a href="https://github.com/optimussh/vibecodingbuilder" target="_blank" rel="noopener"
         >github.com/optimussh/vibecodingbuilder</a>
     </p>
@@ -210,6 +210,21 @@
         <p class="why"><strong>왜:</strong> 같은 게이트웨이 origin에서 IDE 호스팅.</p>
         <div class="path">http://127.0.0.1:3000/chamber/</div>
       </div>
+      <div class="card">
+        <h3><span class="badge ok">완료</span> Chamber 워크스페이스 자동 오픈</h3>
+        <p class="why"><strong>왜:</strong> bind 후 수동 Open folder 없이 프로젝트 진입. URL <code>?directory=&amp;sessionId=</code> + app-ready 부트스트랩.</p>
+        <div class="path">chamberUrl.ts · workspace/bind · /chamber/ redirect</div>
+      </div>
+      <div class="card">
+        <h3><span class="badge ok">완료</span> Diff 구조 뷰</h3>
+        <p class="why"><strong>왜:</strong> session diff JSON 대신 파일 목록·patch 가독성.</p>
+        <div class="path">DiffViewer · sessionDiffParse</div>
+      </div>
+      <div class="card">
+        <h3><span class="badge ok">완료</span> Gemini E2E helper · quiet tests</h3>
+        <p class="why"><strong>왜:</strong> 키 설정 검증 스크립트 · 테스트 pino 노이즈 제거.</p>
+        <div class="path">npm run e2e:gemini · vitest LOG_LEVEL=silent</div>
+      </div>
     </div>
 
     <h2>앞으로 (로컬 외 / 선택)</h2>
@@ -217,13 +232,14 @@
       <ol>
         <li>Docker per-user OS 격리</li>
         <li>LDAP/SSO · 사내 PaaS 배포</li>
-        <li>Chamber SPA base-path 정식 서브패스 호스팅</li>
+        <li>.env 에 실제 GEMINI_API_KEY 후 실에이전트·임베딩 품질 검증 (<code>npm run e2e:gemini:live</code>)</li>
       </ol>
     </div>
 
     <h2>히스토리</h2>
     <div class="card">
       <ul>
+        <li>2026-07-19 — Chamber 자동 오픈 · Diff 구조 뷰 · e2e:gemini · quiet tests</li>
         <li>2026-07-17 — workspace bind · PG 세션/감사 · preview</li>
         <li>2026-07-17 — 포트 자동 연계 · 채팅 빈 화면 수정</li>
         <li>2026-07-17 — MVP · OpenChamber · 게이트웨이</li>

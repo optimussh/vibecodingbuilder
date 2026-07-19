@@ -101,12 +101,15 @@ ragRouter.post(
 ragRouter.delete("/rag/documents/:id", requireAuth, async (req, res) => {
   try {
     const username = req.session.user!.username;
-    const ok = await deleteDocument(username, req.params.id);
+    const docId = Array.isArray(req.params.id)
+      ? String(req.params.id[0] ?? "")
+      : String(req.params.id ?? "");
+    const ok = await deleteDocument(username, docId);
     if (!ok) {
       res.status(404).json({ error: "Not found" });
       return;
     }
-    appendAudit("rag.delete", username, { documentId: req.params.id });
+    appendAudit("rag.delete", username, { documentId: docId });
     res.json({ ok: true });
   } catch (e) {
     const err = e as Error & { status?: number };

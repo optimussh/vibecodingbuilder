@@ -14,6 +14,10 @@ import { ensureWorkspace } from "../workspace.js";
 import * as sessionMap from "../sessionMap.js";
 import { appendAudit } from "../audit.js";
 import { bootstrapUserWorkspace } from "../workspaceBootstrap.js";
+import {
+  buildChamberOpenPath,
+  chamberAutoOpenBootstrapScript,
+} from "../chamberUrl.js";
 
 export const proxyRouter = Router();
 
@@ -152,8 +156,16 @@ const opencodeProxy = createProxyMiddleware({
 proxyRouter.use("/opencode", opencodeProxy);
 
 function rewriteChamberHtml(html: string, chamberOrigin: string): string {
+  const gateway = `http://127.0.0.1:${config.port}`;
   const inject = `<base href="/chamber/"/>
-<script>window.__OPENCHAMBER_API_BASE_URL__=${JSON.stringify(chamberOrigin)};window.__VIBE_PLATFORM__=${JSON.stringify({ gateway: `http://127.0.0.1:${config.port}` })};</script>`;
+<script>
+window.__OPENCHAMBER_API_BASE_URL__=${JSON.stringify(chamberOrigin)};
+window.__VIBE_PLATFORM__=${JSON.stringify({
+    gateway,
+    chamberSubpath: "/chamber/",
+  })};
+${chamberAutoOpenBootstrapScript()}
+</script>`;
   let out = html;
   if (out.includes("<head>")) {
     out = out.replace("<head>", `<head>\n    ${inject}\n`);
@@ -164,14 +176,45 @@ function rewriteChamberHtml(html: string, chamberOrigin: string): string {
   out = out
     .replace(/(href|src)=["']\/(?!chamber\/)/g, `$1="/chamber/`)
     .replace(/url\(\s*\/(?!chamber\/)/g, "url(/chamber/");
+  // Common absolute SPA router fallbacks that leak past <base>
+  out = out.replace(
+    /(["'])\/(assets|favicon|manifest\.webmanifest|sw\.js)/g,
+    `$1/chamber/$2`,
+  );
   return out;
+}
+
+/**
+ * True when this is a document navigation to the Chamber SPA shell
+ * (not assets, api, or nested paths).
+ */
+function isChamberSpaShellRequest(req: Request): boolean {
+  if (req.method !== "GET" && req.method !== "HEAD") return false;
+  const accept = String(req.headers.accept ?? "");
+  if (!accept.includes("text/html") && accept !== "*/*" && accept !== "") {
+    // asset requests often omit text/html
+    if (accept.includes("image") || accept.includes("javascript") || accept.includes("css")) {
+      return false;
+    }
+  }
+  // With app.use("/chamber"), req.url is the remainder after /chamber
+  const pathOnly = (req.url || "/").split("?")[0] || "/";
+  return (
+    pathOnly === "/" ||
+    pathOnly === "" ||
+    pathOnly === "/index.html" ||
+    pathOnly === "/index"
+  );
 }
 
 /**
  * Subpath hosting: /chamber/* → OpenChamber :3001/*
  * - HTML rewritten with <base href="/chamber/"> + API base to :3001
+ * - Auto-open: bare /chamber/ redirects with ?directory=&sessionId=
+ * - Bootstrap script opens workspace on app-ready
  * - Static under /chamber/* proxied
  * - Root /assets|/favicon* also proxied to chamber (SPA absolute paths)
+ * - Fallback /chamber/api/* for relative API when inject fails
  */
 export function mountOpenChamberProxy(app: import("express").Express): void {
   if (!config.openchamberEnabled || !config.openchamberUrl) {
@@ -199,17 +242,44 @@ export function mountOpenChamberProxy(app: import("express").Express): void {
     },
   });
 
-  app.use(
-    ["/assets", "/favicon.svg", "/favicon-32.png", "/favicon-16.png", "/favicon.png", "/apple-touch-icon.png", "/apple-touch-icon-180x180.png", "/apple-touch-icon-167x167.png", "/apple-touch-icon-152x152.png", "/apple-touch-icon-120x120.png", "/manifest.webmanifest", "/sw.js"],
-    (req, res, next) => {
-      // only for browser asset GETs
-      if (req.method !== "GET" && req.method !== "HEAD") {
-        next();
-        return;
-      }
-      assetProxy(req, res, next);
-    },
-  );
+  const rootAssetPaths = [
+    "/assets",
+    "/favicon.svg",
+    "/favicon-32.png",
+    "/favicon-16.png",
+    "/favicon.png",
+    "/apple-touch-icon.png",
+    "/apple-touch-icon-180x180.png",
+    "/apple-touch-icon-167x167.png",
+    "/apple-touch-icon-152x152.png",
+    "/apple-touch-icon-120x120.png",
+    "/manifest.webmanifest",
+    "/sw.js",
+    // Edge: some builds emit hashed icons / workbox at root
+    "/workbox-",
+    "/registerSW.js",
+  ];
+
+  app.use((req, res, next) => {
+    if (req.method !== "GET" && req.method !== "HEAD") {
+      next();
+      return;
+    }
+    const p = req.path || "";
+    const hit = rootAssetPaths.some(
+      (prefix) => p === prefix || p.startsWith(prefix.endsWith("-") ? prefix : prefix + "/"),
+    );
+    // Don't steal platform routes
+    if (!hit) {
+      next();
+      return;
+    }
+    if (p.startsWith("/api") || p.startsWith("/opencode") || p.startsWith("/docs")) {
+      next();
+      return;
+    }
+    assetProxy(req, res, next);
+  });
 
   const chamberProxy = createProxyMiddleware({
     target,
@@ -232,6 +302,9 @@ export function mountOpenChamberProxy(app: import("express").Express): void {
         if (username) {
           bootstrapUserWorkspace(username);
         }
+        // Preserve upgrade-related headers for SSE/WS fallbacks under subpath
+        const accept = (req as Request).headers.accept;
+        if (accept) proxyReq.setHeader("accept", accept);
       },
       error: (err, _req, res) => {
         const r = res as Response;
@@ -251,13 +324,42 @@ export function mountOpenChamberProxy(app: import("express").Express): void {
   app.use(
     "/chamber",
     requireAuthOrLogin,
-    (req: Request, _res: Response, next: NextFunction) => {
+    (req: Request, res: Response, next: NextFunction) => {
       appendAudit("chamber.access", req.session.user?.username, {
         path: req.path,
       });
-      if (req.session.user) {
-        bootstrapUserWorkspace(req.session.user.username);
+      const username = req.session.user?.username;
+      if (!username) {
+        next();
+        return;
       }
+
+      const workspace = bootstrapUserWorkspace(username);
+
+      // Auto-open: bare SPA shell → redirect with directory (+ latest session)
+      if (isChamberSpaShellRequest(req)) {
+        const u = new URL(req.originalUrl || "/chamber/", "http://local");
+        if (!u.searchParams.has("directory")) {
+          const latest = sessionMap
+            .listRecordsByUser(username)
+            .sort((a, b) =>
+              String(b.createdAt || "").localeCompare(String(a.createdAt || "")),
+            )[0];
+          const dest = buildChamberOpenPath({
+            workspace,
+            sessionId: latest?.id ?? u.searchParams.get("sessionId"),
+          });
+          // Preserve any extra query keys
+          const destUrl = new URL(dest, "http://local");
+          u.searchParams.forEach((v, k) => {
+            if (!destUrl.searchParams.has(k)) destUrl.searchParams.set(k, v);
+          });
+          const q = destUrl.searchParams.toString();
+          res.redirect(302, q ? `/chamber/?${q}` : "/chamber/");
+          return;
+        }
+      }
+
       // empty path → index
       if (req.url === "" || req.url === "/") {
         req.url = "/";

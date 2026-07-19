@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState, type ReactNode } from "react";
+import { useCallback, useEffect, useMemo, useState, type ReactNode } from "react";
 import { api } from "../api/client";
 import { useChatStore } from "../stores/chatStore";
 
@@ -18,13 +18,191 @@ function colorizeDiff(diff: string): ReactNode[] {
   });
 }
 
+type FileDiffEntry = {
+  path: string;
+  status?: string;
+  additions?: number;
+  deletions?: number;
+  before?: string;
+  after?: string;
+  patch?: string;
+  raw?: unknown;
+};
+
+function pickString(obj: Record<string, unknown>, keys: string[]): string | undefined {
+  for (const k of keys) {
+    const v = obj[k];
+    if (typeof v === "string" && v.length > 0) return v;
+  }
+  return undefined;
+}
+
+function pickNumber(obj: Record<string, unknown>, keys: string[]): number | undefined {
+  for (const k of keys) {
+    const v = obj[k];
+    if (typeof v === "number" && Number.isFinite(v)) return v;
+  }
+  return undefined;
+}
+
+/** Normalize OpenCode / platform session-diff payloads into file rows. */
+export function parseSessionDiff(raw: unknown): FileDiffEntry[] | null {
+  // Keep in sync with apps/server/src/sessionDiffParse.ts
+  if (raw == null) return null;
+
+  let list: unknown[] | null = null;
+  if (Array.isArray(raw)) {
+    list = raw;
+  } else if (typeof raw === "object") {
+    const o = raw as Record<string, unknown>;
+    if (Array.isArray(o.files)) list = o.files;
+    else if (Array.isArray(o.diff)) list = o.diff;
+    else if (Array.isArray(o.patches)) list = o.patches;
+    else if (Array.isArray(o.entries)) list = o.entries;
+    else if (typeof o.patch === "string" || typeof o.diff === "string") {
+      return [
+        {
+          path: pickString(o, ["path", "file", "filename", "filePath"]) || "(session)",
+          patch: (o.patch as string) || (o.diff as string),
+          raw: o,
+        },
+      ];
+    }
+  } else if (typeof raw === "string") {
+    try {
+      return parseSessionDiff(JSON.parse(raw));
+    } catch {
+      return null;
+    }
+  }
+
+  if (!list || list.length === 0) return null;
+
+  const entries: FileDiffEntry[] = [];
+  for (const item of list) {
+    if (typeof item === "string") {
+      entries.push({ path: item });
+      continue;
+    }
+    if (!item || typeof item !== "object") continue;
+    const o = item as Record<string, unknown>;
+    const path =
+      pickString(o, [
+        "path",
+        "file",
+        "filename",
+        "filePath",
+        "name",
+        "file_path",
+      ]) || "(unknown)";
+    entries.push({
+      path,
+      status: pickString(o, ["status", "type", "kind", "change"]),
+      additions: pickNumber(o, ["additions", "added", "insertions", "+"]),
+      deletions: pickNumber(o, ["deletions", "deleted", "removals", "-"]),
+      before: pickString(o, ["before", "old", "previous", "left"]),
+      after: pickString(o, ["after", "new", "next", "right"]),
+      patch: pickString(o, ["patch", "diff", "unified", "content"]),
+      raw: item,
+    });
+  }
+  return entries.length ? entries : null;
+}
+
+function FileDiffStructure({ entries }: { entries: FileDiffEntry[] }) {
+  const [openPath, setOpenPath] = useState<string | null>(entries[0]?.path ?? null);
+
+  return (
+    <div className="flex min-h-0 flex-1 flex-col overflow-hidden sm:flex-row">
+      <ul className="max-h-40 shrink-0 overflow-auto border-b border-zinc-800 sm:max-h-none sm:w-52 sm:border-b-0 sm:border-r">
+        {entries.map((e) => {
+          const active = openPath === e.path;
+          return (
+            <li key={e.path}>
+              <button
+                type="button"
+                onClick={() => setOpenPath(e.path)}
+                className={`flex w-full flex-col gap-0.5 px-3 py-2 text-left text-[11px] ${
+                  active
+                    ? "bg-indigo-950/60 text-indigo-200"
+                    : "text-zinc-300 hover:bg-zinc-800/80"
+                }`}
+              >
+                <span className="truncate font-medium" title={e.path}>
+                  {e.path.split(/[/\\]/).pop() || e.path}
+                </span>
+                <span className="truncate text-[10px] text-zinc-500" title={e.path}>
+                  {e.path}
+                </span>
+                <span className="flex gap-2 text-[10px]">
+                  {e.status && (
+                    <span className="text-zinc-400">{e.status}</span>
+                  )}
+                  {typeof e.additions === "number" && (
+                    <span className="text-emerald-400">+{e.additions}</span>
+                  )}
+                  {typeof e.deletions === "number" && (
+                    <span className="text-red-400">−{e.deletions}</span>
+                  )}
+                </span>
+              </button>
+            </li>
+          );
+        })}
+      </ul>
+      <div className="min-h-0 flex-1 overflow-auto p-3 font-mono text-[11px] leading-relaxed">
+        {(() => {
+          const e = entries.find((x) => x.path === openPath) ?? entries[0];
+          if (!e) return <span className="text-zinc-500">No files</span>;
+          if (e.patch) {
+            return <div>{colorizeDiff(e.patch)}</div>;
+          }
+          if (e.before != null || e.after != null) {
+            return (
+              <div className="grid gap-3 md:grid-cols-2">
+                <div>
+                  <div className="mb-1 text-[10px] uppercase tracking-wide text-zinc-500">
+                    Before
+                  </div>
+                  <pre className="whitespace-pre-wrap rounded border border-zinc-800 bg-zinc-950/60 p-2 text-red-300/90">
+                    {e.before ?? "(empty)"}
+                  </pre>
+                </div>
+                <div>
+                  <div className="mb-1 text-[10px] uppercase tracking-wide text-zinc-500">
+                    After
+                  </div>
+                  <pre className="whitespace-pre-wrap rounded border border-zinc-800 bg-zinc-950/60 p-2 text-emerald-300/90">
+                    {e.after ?? "(empty)"}
+                  </pre>
+                </div>
+              </div>
+            );
+          }
+          return (
+            <pre className="whitespace-pre-wrap text-zinc-400">
+              {JSON.stringify(e.raw ?? e, null, 2)}
+            </pre>
+          );
+        })()}
+      </div>
+    </div>
+  );
+}
+
 export function DiffViewer() {
   const activeSessionId = useChatStore((s) => s.activeSessionId);
   const [open, setOpen] = useState(false);
   const [tab, setTab] = useState<"git" | "session">("git");
   const [text, setText] = useState("");
+  const [sessionRaw, setSessionRaw] = useState<unknown>(null);
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
+
+  const sessionEntries = useMemo(
+    () => (tab === "session" ? parseSessionDiff(sessionRaw) : null),
+    [tab, sessionRaw],
+  );
 
   const load = useCallback(async () => {
     setBusy(true);
@@ -33,19 +211,21 @@ export function DiffViewer() {
       if (tab === "git") {
         const d = await api.gitDiff(false);
         setText(d.diff || "(no unstaged changes)");
+        setSessionRaw(null);
       } else if (activeSessionId) {
         const raw = await api.sessionDiff(activeSessionId);
+        setSessionRaw(raw);
         setText(
-          typeof raw === "string"
-            ? raw
-            : JSON.stringify(raw, null, 2),
+          typeof raw === "string" ? raw : JSON.stringify(raw, null, 2),
         );
       } else {
         setText("(select a session)");
+        setSessionRaw(null);
       }
     } catch (e) {
       setError(e instanceof Error ? e.message : "diff failed");
       setText("");
+      setSessionRaw(null);
     } finally {
       setBusy(false);
     }
@@ -108,9 +288,21 @@ export function DiffViewer() {
             {error}
           </div>
         )}
-        <pre className="flex-1 overflow-auto p-4 font-mono text-[11px] leading-relaxed">
-          {busy ? "Loading…" : colorizeDiff(text)}
-        </pre>
+        {busy ? (
+          <div className="p-4 text-xs text-zinc-500">Loading…</div>
+        ) : tab === "session" && sessionEntries ? (
+          <>
+            <div className="border-b border-zinc-800 px-4 py-1.5 text-[10px] text-zinc-500">
+              {sessionEntries.length} file
+              {sessionEntries.length === 1 ? "" : "s"} · structured view
+            </div>
+            <FileDiffStructure entries={sessionEntries} />
+          </>
+        ) : (
+          <pre className="flex-1 overflow-auto p-4 font-mono text-[11px] leading-relaxed">
+            {colorizeDiff(text)}
+          </pre>
+        )}
       </div>
     </div>
   );

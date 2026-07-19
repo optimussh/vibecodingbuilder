@@ -3,6 +3,7 @@ import { requireAuth } from "../auth/requireAuth.js";
 import { checkOpencodeHealth } from "../opencode/client.js";
 import {
   opencodeFetch,
+  opencodeUrl,
   parseJsonBody,
   sessionIdOf,
   directoryOf,
@@ -26,6 +27,11 @@ async function requireOpencodeUp() {
 
 function workspaceOf(username: string): string {
   return ensureWorkspace(config.workspacesRoot, username);
+}
+
+function paramId(value: string | string[] | undefined): string {
+  if (Array.isArray(value)) return String(value[0] ?? "");
+  return String(value ?? "");
 }
 
 function requireSessionOwner(
@@ -129,10 +135,10 @@ sessionsRouter.post("/sessions", requireAuth, async (req, res) => {
 
 sessionsRouter.get("/sessions/:id", requireAuth, async (req, res) => {
   try {
-    await requireOpencodeUp();
     const username = req.session.user!.username;
-    const id = req.params.id;
+    const id = paramId(req.params.id);
     const rec = requireSessionOwner(id, username);
+    await requireOpencodeUp();
 
     const result = await opencodeFetch(`/session/${id}`, {
       method: "GET",
@@ -151,10 +157,10 @@ sessionsRouter.get("/sessions/:id", requireAuth, async (req, res) => {
 
 sessionsRouter.patch("/sessions/:id", requireAuth, async (req, res) => {
   try {
-    await requireOpencodeUp();
     const username = req.session.user!.username;
-    const id = req.params.id;
+    const id = paramId(req.params.id);
     const rec = requireSessionOwner(id, username);
+    await requireOpencodeUp();
     const title = String(req.body?.title ?? "").trim();
     if (!title) {
       res.status(400).json({ error: "title is required" });
@@ -180,10 +186,10 @@ sessionsRouter.patch("/sessions/:id", requireAuth, async (req, res) => {
 
 sessionsRouter.delete("/sessions/:id", requireAuth, async (req, res) => {
   try {
-    await requireOpencodeUp();
     const username = req.session.user!.username;
-    const id = req.params.id;
+    const id = paramId(req.params.id);
     const rec = requireSessionOwner(id, username);
+    await requireOpencodeUp();
 
     const result = await opencodeFetch(`/session/${id}`, {
       method: "DELETE",
@@ -204,10 +210,10 @@ sessionsRouter.delete("/sessions/:id", requireAuth, async (req, res) => {
 
 sessionsRouter.get("/sessions/:id/diff", requireAuth, async (req, res) => {
   try {
-    await requireOpencodeUp();
     const username = req.session.user!.username;
-    const id = req.params.id;
+    const id = paramId(req.params.id);
     const rec = requireSessionOwner(id, username);
+    await requireOpencodeUp();
     const q = req.query.messageID
       ? `?messageID=${encodeURIComponent(String(req.query.messageID))}`
       : "";
@@ -228,10 +234,10 @@ sessionsRouter.get("/sessions/:id/diff", requireAuth, async (req, res) => {
 
 sessionsRouter.get("/sessions/:id/messages", requireAuth, async (req, res) => {
   try {
-    await requireOpencodeUp();
     const username = req.session.user!.username;
-    const id = req.params.id;
+    const id = paramId(req.params.id);
     const rec = requireSessionOwner(id, username);
+    await requireOpencodeUp();
 
     const result = await opencodeFetch(`/session/${id}/message`, {
       method: "GET",
@@ -254,10 +260,10 @@ sessionsRouter.post(
   messageLimiter,
   async (req, res) => {
   try {
-    await requireOpencodeUp();
     const username = req.session.user!.username;
-    const id = req.params.id;
+    const id = paramId(req.params.id);
     const rec = requireSessionOwner(id, username);
+    await requireOpencodeUp();
 
     const text = String(req.body?.text ?? "").trim();
     if (!text) {
@@ -290,7 +296,7 @@ sessionsRouter.post(
         ragHits = hits.length;
         const ctx = formatRagContext(hits);
         if (ctx) {
-          promptText = `${ctx}사용자 질문:\n${text}`;
+          promptText = `${ctx}?�용??질문:\n${text}`;
           appendAudit("rag.inject", username, {
             sessionId: id,
             hitCount: ragHits,
@@ -358,10 +364,10 @@ sessionsRouter.post(
 
 sessionsRouter.post("/sessions/:id/abort", requireAuth, async (req, res) => {
   try {
-    await requireOpencodeUp();
     const username = req.session.user!.username;
-    const id = req.params.id;
+    const id = paramId(req.params.id);
     const rec = requireSessionOwner(id, username);
+    await requireOpencodeUp();
 
     const result = await opencodeFetch(`/session/${id}/abort`, {
       method: "POST",
@@ -382,11 +388,11 @@ sessionsRouter.post(
   requireAuth,
   async (req, res) => {
     try {
-      await requireOpencodeUp();
       const username = req.session.user!.username;
-      const id = req.params.id;
-      const permissionId = req.params.permissionId;
+      const id = paramId(req.params.id);
+      const permissionId = paramId(req.params.permissionId);
       const rec = requireSessionOwner(id, username);
+      await requireOpencodeUp();
 
       const response = String(req.body?.response ?? "reject");
       const allowed = ["once", "always", "reject"];
@@ -426,7 +432,7 @@ sessionsRouter.post(
   },
 );
 
-/** Debug helper — not used by UI */
+/** Debug helper ??not used by UI */
 export function sessionCreateUrl(workspace: string): string {
   return opencodeUrl("/session", workspace);
 }

@@ -76,6 +76,18 @@
 - **Why:** 사용자 요청 3종 고도화
 - **Status:** done
 
+#### 잔여 폴리시 일괄 (자동 오픈 · 서브패스 · E2E · 로그 · Diff)
+
+- **What:**
+  - Chamber 워크스페이스 **자동 오픈**: `POST /api/workspace/bind` → `chamberUrl`/`chamberPath` 에 `?directory=&sessionId=` 포함; bare `/chamber/` 리다이렉트; HTML inject 로 `openchamber:open-session` / `open-draft-session` 부트스트랩
+  - 서브패스 엣지: root asset 프록시 확장, HTML rewrite 강화, Chamber proxy `ws: true` 유지
+  - Gemini E2E helper: `npm run e2e:gemini` / `e2e:gemini:live` (키 없으면 안내만, 키 발명 안 함)
+  - vitest `LOG_LEVEL=silent` 로 테스트 로그 노이즈 제거
+  - Diff 뷰어: session diff **파일 목록 + before/after/patch 구조 뷰** (JSON 덤프 폴백)
+  - 세션 라우트: **소유권 검사 후** OpenCode health (격리 테스트 503→403 수정)
+- **Why:** 남아 있던 로컬 폴리시 항목 전체 적용
+- **Status:** done
+
 ### 이전 완료 (MVP)
 
 | 커밋 | 내용 |

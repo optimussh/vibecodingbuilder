@@ -2,7 +2,7 @@ import express from "express";
 import cors from "cors";
 import cookieParser from "cookie-parser";
 import path from "node:path";
-import pinoHttp from "pino-http";
+import { pinoHttp } from "pino-http";
 import { createSessionMiddleware } from "./auth/session.js";
 import { authRouter } from "./auth/routes.js";
 import { healthRouter } from "./routes/health.js";

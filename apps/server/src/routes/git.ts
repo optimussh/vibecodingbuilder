@@ -1,5 +1,5 @@
 import { Router } from "express";
-import simpleGit from "simple-git";
+import { simpleGit } from "simple-git";
 import { requireAuth } from "../auth/requireAuth.js";
 import { bootstrapUserWorkspace } from "../workspaceBootstrap.js";
 import { appendAudit } from "../audit.js";

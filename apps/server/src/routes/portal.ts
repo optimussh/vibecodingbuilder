@@ -44,8 +44,8 @@ portalRouter.get("/", (req, res) => {
 
     <a class="card" href="http://127.0.0.1:5173/"><strong>1. 채팅 UI</strong><br/>
       <span class="muted">세션 · 메시지 · RAG · 파일 트리 — 가장 확실한 채팅</span></a>
-    <a class="card" href="/chamber/"><strong>2. OpenChamber IDE (서브패스)</strong><br/>
-      <span class="muted">http://127.0.0.1:3000/chamber/ · SPA 자산 프록시 · API는 :3001</span></a>
+    <button class="card" type="button" id="btnChamber"><strong>2. OpenChamber IDE (자동 오픈)</strong><br/>
+      <span class="muted">bind → /chamber/?directory=…&amp;sessionId=… · 워크스페이스 자동 오픈</span></button>
     <button class="card" type="button" id="btnPreview"><strong>3. 앱 미리보기 시작</strong><br/>
       <span class="muted">워크스페이스에서 dev 서버 스폰 → /preview/app/</span></button>
     <div id="preview">preview: idle</div>
@@ -89,6 +89,23 @@ portalRouter.get("/", (req, res) => {
       if (!r.ok) { alert(data.error || 'preview failed'); return; }
       await refreshPreview();
       window.open(data.url || '/preview/app/', '_blank');
+    };
+    document.getElementById('btnChamber').onclick = async () => {
+      try {
+        const r = await fetch('/api/workspace/bind', {
+          method: 'POST', credentials: 'include',
+          headers: { 'Content-Type': 'application/json' }, body: '{}'
+        });
+        if (r.status === 401) {
+          location.href = '/login?next=' + encodeURIComponent('/chamber/');
+          return;
+        }
+        const data = await r.json();
+        if (!r.ok) { alert(data.error || 'workspace bind failed'); return; }
+        location.href = data.chamberPath || data.chamberUrl || '/chamber/';
+      } catch (e) {
+        alert('chamber open failed: ' + e);
+      }
     };
     refreshStack();
     refreshPreview();

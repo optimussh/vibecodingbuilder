@@ -91,15 +91,38 @@ export function ChatPage() {
           )}
         </div>
         <div className="flex items-center gap-3 text-sm">
-          <a
-            href="http://127.0.0.1:3000/chamber/"
-            target="_blank"
-            rel="noreferrer"
+          <button
+            type="button"
+            onClick={() => {
+              void api
+                .workspaceBind()
+                .then((b) => {
+                  const url =
+                    b.chamberPath ||
+                    b.chamberUrl ||
+                    "http://127.0.0.1:3000/chamber/";
+                  // Same-origin path keeps cookie; absolute URL also ok
+                  window.open(
+                    url.startsWith("/")
+                      ? `http://127.0.0.1:3000${url}`
+                      : url,
+                    "_blank",
+                    "noopener,noreferrer",
+                  );
+                })
+                .catch(() => {
+                  window.open(
+                    "http://127.0.0.1:3000/chamber/",
+                    "_blank",
+                    "noopener,noreferrer",
+                  );
+                });
+            }}
             className="text-xs text-indigo-400 hover:text-indigo-300"
-            title="게이트웨이 서브패스 /chamber/ (로그인 필요)"
+            title="워크스페이스 bind 후 Chamber 자동 오픈"
           >
             Chamber
-          </a>
+          </button>
           <button
             type="button"
             onClick={() =>

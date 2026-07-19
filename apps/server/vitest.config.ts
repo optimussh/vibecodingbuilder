@@ -5,5 +5,9 @@ export default defineConfig({
     environment: "node",
     include: ["src/**/*.test.ts"],
     fileParallelism: false,
+    // Quiet pino / app logs during unit tests
+    env: {
+      LOG_LEVEL: "silent",
+    },
   },
 });
