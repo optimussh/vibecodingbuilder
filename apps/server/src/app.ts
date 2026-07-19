@@ -27,6 +27,9 @@ import { templatesRouter } from "./routes/templates.js";
 import { specsRouter } from "./routes/specs.js";
 import { steeringRouter } from "./routes/steering.js";
 import { adminPageRouter } from "./routes/adminPage.js";
+import { skillsRouter } from "./routes/skills.js";
+import { hooksRouter } from "./routes/hooks.js";
+import { evalRouter } from "./routes/eval.js";
 import { apiLimiter } from "./middleware/rateLimit.js";
 import * as sessionMap from "./sessionMap.js";
 import { bootstrapUserWorkspace } from "./workspaceBootstrap.js";
@@ -113,6 +116,9 @@ export function createApp(_options: CreateAppOptions = {}) {
   app.use("/api", templatesRouter);
   app.use("/api", specsRouter);
   app.use("/api", steeringRouter);
+  app.use("/api", skillsRouter);
+  app.use("/api", hooksRouter);
+  app.use("/api", evalRouter);
 
   app.get("/api/usage/me", requireAuth, async (req, res) => {
     const username = req.session.user!.username;

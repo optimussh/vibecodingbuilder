@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
 import { useAuthStore } from "../stores/authStore";
 import { useChatStore } from "../stores/chatStore";
 import { api } from "../api/client";
@@ -12,6 +11,8 @@ import { GitPanel } from "../components/GitPanel";
 import { StatusBar } from "../components/StatusBar";
 import { PermissionCard } from "../components/PermissionCard";
 import { DiffViewer } from "../components/DiffViewer";
+import { ProjectPanel } from "../components/ProjectPanel";
+import { SpecPanel } from "../components/SpecPanel";
 import { ResizeHandle } from "../components/ResizeHandle";
 import { usePanelWidths } from "../hooks/usePanelWidths";
 
@@ -144,9 +145,14 @@ export function ChatPage() {
             레이아웃
           </button>
           {user?.role === "admin" && (
-            <Link to="/admin" className="text-indigo-400 hover:text-indigo-300">
+            <a
+              href="http://127.0.0.1:3000/admin"
+              target="_blank"
+              rel="noreferrer"
+              className="text-indigo-400 hover:text-indigo-300"
+            >
               Admin
-            </Link>
+            </a>
           )}
           <button
             type="button"
@@ -159,12 +165,17 @@ export function ChatPage() {
       </header>
 
       <div className="flex min-h-0 flex-1 overflow-hidden">
-        {/* Sessions */}
+        {/* Sessions + Projects */}
         <div
-          className="min-h-0 shrink-0 overflow-hidden"
+          className="flex min-h-0 shrink-0 flex-col overflow-hidden border-r border-zinc-800"
           style={{ width: widths.sessions }}
         >
-          <SessionList />
+          <div className="min-h-0 flex-1 overflow-hidden">
+            <SessionList />
+          </div>
+          <div className="max-h-[42%] min-h-[120px] shrink-0 border-t border-zinc-800 overflow-hidden">
+            <ProjectPanel />
+          </div>
         </div>
 
         <ResizeHandle
@@ -202,12 +213,17 @@ export function ChatPage() {
           title="RAG 패널 너비 · 드래그 조절 · 더블클릭 기본값"
         />
 
-        {/* RAG */}
+        {/* RAG + Specs */}
         <div
-          className="min-h-0 shrink-0 overflow-hidden"
+          className="flex min-h-0 shrink-0 flex-col overflow-hidden"
           style={{ width: widths.rag }}
         >
-          <RagPanel />
+          <div className="min-h-0 flex-1 overflow-hidden">
+            <RagPanel />
+          </div>
+          <div className="max-h-[45%] min-h-[100px] shrink-0 border-t border-zinc-800 overflow-hidden">
+            <SpecPanel />
+          </div>
         </div>
       </div>
 

@@ -42,6 +42,15 @@
 - **Why:** 파일럿 거버넌스 + 데이터/정책 해자 시드
 - **Status:** done (코드)
 
+### 권장 스펙 코드 완성 배치 (모트 확장)
+
+- **What:**
+  - Project-aware FS/upload/git · steering inject · users PG sync
+  - Skills marketplace · GitHub hooks queue · eval harness
+  - Web: ProjectPanel + SpecPanel · docker-compose.prod · install-onprem · security one-pager
+- **Why:** 로드맵 권장 항목을 동작 코드 수준으로 마감
+- **Status:** done
+
 ---
 
 ## 2026-07-17

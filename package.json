@@ -17,6 +17,7 @@
     "test": "npm run test -w @codeharbor/server",
     "e2e:gemini": "node scripts/e2e-gemini.mjs",
     "e2e:gemini:live": "node scripts/e2e-gemini.mjs --live",
+    "install:onprem": "powershell -NoProfile -ExecutionPolicy Bypass -File scripts/install-onprem.ps1",
     "build": "npm run build -w @codeharbor/server && npm run build -w @codeharbor/web"
   },
   "devDependencies": {

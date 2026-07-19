@@ -54,6 +54,7 @@ export function createLocalUser(
     dailyQuota: null,
   };
   getUsers().push(u);
+  void import("./usersPg.js").then((m) => m.persistUser(u));
   return u;
 }
 
@@ -86,12 +87,18 @@ function cryptoRandom(): string {
 
 export function setUserRole(username: string, role: Role): void {
   const u = findUser(username);
-  if (u) u.role = role;
+  if (u) {
+    u.role = role;
+    void import("./usersPg.js").then((m) => m.persistUser(u));
+  }
 }
 
 export function setUserDisabled(username: string, disabled: boolean): void {
   const u = findUser(username);
-  if (u) u.disabled = disabled;
+  if (u) {
+    u.disabled = disabled;
+    void import("./usersPg.js").then((m) => m.persistUser(u));
+  }
 }
 
 export function setUserQuota(
@@ -99,5 +106,8 @@ export function setUserQuota(
   dailyQuota: number | null,
 ): void {
   const u = findUser(username);
-  if (u) u.dailyQuota = dailyQuota;
+  if (u) {
+    u.dailyQuota = dailyQuota;
+    void import("./usersPg.js").then((m) => m.persistUser(u));
+  }
 }

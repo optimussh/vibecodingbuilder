@@ -283,8 +283,10 @@ sessionsRouter.post(
 
     appendAudit("message.send", username, { sessionId: id });
 
-    // Phase 3: inject RAG context (fail-open if RAG down)
-    let promptText = text;
+    // Steering + RAG context (fail-open)
+    const { loadSteeringContext } = await import("../workspaceRoot.js");
+    const steering = loadSteeringContext();
+    let promptText = steering ? `${steering}${text}` : text;
     let ragHits = 0;
     const useRag = req.body?.rag !== false && config.ragEnabled;
     if (useRag) {
@@ -296,7 +298,7 @@ sessionsRouter.post(
         ragHits = hits.length;
         const ctx = formatRagContext(hits);
         if (ctx) {
-          promptText = `${ctx}User question:\n${text}`;
+          promptText = `${steering}${ctx}User question:\n${text}`;
           appendAudit("rag.inject", username, {
             sessionId: id,
             hitCount: ragHits,

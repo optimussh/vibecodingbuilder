@@ -50,6 +50,8 @@ adminPageRouter.get("/admin", requireAdminHtml, (_req, res) => {
     <button type="button" data-tab="audit" class="secondary">Audit</button>
     <button type="button" data-tab="usage" class="secondary">Usage</button>
     <button type="button" data-tab="settings" class="secondary">Settings</button>
+    <button type="button" data-tab="hooks" class="secondary">Hooks</button>
+    <button type="button" data-tab="eval" class="secondary">Eval</button>
   </div>
 
   <section id="panel-users">
@@ -98,6 +100,18 @@ adminPageRouter.get("/admin", requireAdminHtml, (_req, res) => {
     <h2>Settings</h2>
     <pre id="settings"></pre>
   </section>
+  <section id="panel-hooks" hidden>
+    <h2>Hooks queue</h2>
+    <p class="muted">POST /api/hooks/github · HOOKS_SECRET optional</p>
+    <button type="button" id="btnHooks" class="secondary">Refresh queue</button>
+    <pre id="hooks"></pre>
+  </section>
+  <section id="panel-eval" hidden>
+    <h2>Eval harness</h2>
+    <p class="muted">Offline golden tasks (no LLM). Submit sample answers to score.</p>
+    <button type="button" id="btnEval">Run sample eval</button>
+    <pre id="eval"></pre>
+  </section>
 </div>
 <script>
 const $ = (id) => document.getElementById(id);
@@ -108,8 +122,9 @@ async function api(path, opts) {
   return data;
 }
 function showTab(name) {
-  for (const p of ['users','creds','audit','usage','settings']) {
-    $('panel-' + p).hidden = p !== name;
+  for (const p of ['users','creds','audit','usage','settings','hooks','eval']) {
+    const el = $('panel-' + p);
+    if (el) el.hidden = p !== name;
   }
   document.querySelectorAll('.tabs button').forEach(b => {
     b.classList.toggle('active', b.dataset.tab === name);
@@ -182,6 +197,19 @@ $('btnUsage').onclick = () => loadUsage();
 async function loadSettings() {
   $('settings').textContent = JSON.stringify(await api('/api/admin/settings'), null, 2);
 }
+$('btnHooks').onclick = async () => {
+  $('hooks').textContent = JSON.stringify(await api('/api/hooks/queue'), null, 2);
+};
+$('btnEval').onclick = async () => {
+  const { tasks } = await api('/api/eval/tasks');
+  const answers = {};
+  for (const t of tasks) {
+    answers[t.id] = (t.expectIncludes || []).join(' ') + ' ' + t.prompt;
+  }
+  $('eval').textContent = JSON.stringify(await api('/api/eval/run', {
+    method: 'POST', body: JSON.stringify({ answers })
+  }), null, 2);
+};
 
 loadUsers(); loadCreds(); loadSettings();
 </script>

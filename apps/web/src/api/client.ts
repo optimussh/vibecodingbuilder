@@ -121,12 +121,23 @@ export const api = {
       },
     );
   },
-  fsTree() {
-    return request<{ root: string; tree: FileNode[] }>("/api/fs");
+  fsTree(projectId?: string | null) {
+    const q = projectId
+      ? `?projectId=${encodeURIComponent(projectId)}`
+      : "";
+    return request<{
+      root: string;
+      tree: FileNode[];
+      kind?: string;
+      projectId?: string | null;
+      path?: string;
+    }>(`/api/fs${q}`);
   },
-  fsContent(path: string) {
+  fsContent(path: string, projectId?: string | null) {
+    const q = new URLSearchParams({ path });
+    if (projectId) q.set("projectId", projectId);
     return request<{ path: string; content: string }>(
-      `/api/fs/content?path=${encodeURIComponent(path)}`,
+      `/api/fs/content?${q}`,
     );
   },
   adminUsers() {
@@ -257,10 +268,11 @@ export const api = {
   sessionDiff(id: string) {
     return request<unknown>(`/api/sessions/${id}/diff`);
   },
-  async workspaceUpload(file: File, dir = ".") {
+  async workspaceUpload(file: File, dir = ".", projectId?: string | null) {
     const fd = new FormData();
     fd.append("file", file);
     fd.append("dir", dir);
+    if (projectId) fd.append("projectId", projectId);
     const res = await fetch("/api/workspace/upload", {
       method: "POST",
       credentials: "include",
@@ -273,5 +285,112 @@ export const api = {
       );
     }
     return data as { ok: boolean; path: string; bytes: number };
+  },
+  projects() {
+    return request<{
+      projects: Array<{
+        id: string;
+        slug: string;
+        name: string;
+        myRole: string;
+        rootPath: string;
+      }>;
+    }>("/api/projects");
+  },
+  createProject(name: string) {
+    return request<Record<string, unknown>>("/api/projects", {
+      method: "POST",
+      body: JSON.stringify({ name }),
+    });
+  },
+  projectBind(id: string) {
+    return request<{
+      projectId: string;
+      workspace: string;
+      sessionId: string | null;
+      chamberPath: string;
+      chamberUrl: string;
+    }>(`/api/projects/${id}/bind`, {
+      method: "POST",
+      body: JSON.stringify({}),
+    });
+  },
+  templates() {
+    return request<{ templates: Array<{ id: string; name: string }> }>(
+      "/api/templates",
+    );
+  },
+  applyTemplate(id: string, projectId?: string | null) {
+    return request<{ ok: boolean; workspace: string }>(
+      `/api/templates/${id}/apply`,
+      {
+        method: "POST",
+        body: JSON.stringify({ projectId: projectId ?? undefined }),
+      },
+    );
+  },
+  skills() {
+    return request<{
+      skills: Array<{ id: string; name: string; description: string }>;
+    }>("/api/skills");
+  },
+  applySkill(id: string, projectId?: string | null) {
+    return request<{ ok: boolean }>(`/api/skills/${id}/apply`, {
+      method: "POST",
+      body: JSON.stringify({ projectId: projectId ?? undefined }),
+    });
+  },
+  specs() {
+    return request<{
+      specs: Array<{
+        id: string;
+        title: string;
+        requirements: string;
+        design: string;
+        tasks: Array<{ id: string; title: string; done: boolean }>;
+      }>;
+    }>("/api/specs");
+  },
+  createSpec(title: string, projectId?: string | null) {
+    return request<Record<string, unknown>>("/api/specs", {
+      method: "POST",
+      body: JSON.stringify({ title, projectId: projectId ?? undefined }),
+    });
+  },
+  patchSpec(
+    id: string,
+    body: {
+      title?: string;
+      requirements?: string;
+      design?: string;
+      tasks?: Array<{ id: string; title: string; done: boolean }>;
+    },
+  ) {
+    return request<Record<string, unknown>>(`/api/specs/${id}`, {
+      method: "PATCH",
+      body: JSON.stringify(body),
+    });
+  },
+  usageMe() {
+    return request<{
+      rows: Array<{
+        username: string;
+        messages: number;
+        estCostUsd: number;
+      }>;
+      totalEstCostUsd: number;
+    }>("/api/usage/me");
+  },
+  sandboxStatus(projectId?: string | null) {
+    const q = projectId
+      ? `?projectId=${encodeURIComponent(projectId)}`
+      : "";
+    return request<Record<string, unknown>>(`/api/sandbox/status${q}`);
+  },
+  sandboxStart(projectId?: string | null) {
+    return request<Record<string, unknown>>("/api/sandbox/start", {
+      method: "POST",
+      body: JSON.stringify({ projectId: projectId ?? undefined }),
+    });
   },
 };

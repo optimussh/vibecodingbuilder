@@ -4,16 +4,25 @@ build/
 .env
 data/workspaces/*
 !data/workspaces/.gitkeep
+data/projects/*
+!data/projects/.gitkeep
 data/audit/*
 !data/audit/.gitkeep
+data/usage/*
+data/hooks-queue/*
+data/eval/reports/*
+data/credentials.json
+data/projects-index.json
 data/session-map.json
 data/quota.json
+data/specs/*
+!data/specs/.gitkeep
 opencode.json
 *.log
 .DS_Store
 Thumbs.db
 
-# OpenChamber full clone is large — fetch via scripts/fetch-openchamber.ps1
+# OpenChamber full clone — fetch via scripts/fetch-openchamber.ps1
 vendor/openchamber/
 !vendor/PIN.md
 !vendor/openchamber.sha

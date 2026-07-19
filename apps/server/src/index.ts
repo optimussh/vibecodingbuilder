@@ -6,6 +6,7 @@ import { ensurePlatformSchema } from "./db/platformSchema.js";
 import * as sessionMap from "./sessionMap.js";
 import { stopAllPreviews } from "./preview/manager.js";
 import { resolveGeminiKey } from "./credentials/vault.js";
+import { syncUsersWithPostgres } from "./usersPg.js";
 import fs from "node:fs";
 
 fs.mkdirSync(config.workspacesRoot, { recursive: true });
@@ -38,6 +39,7 @@ const server = app.listen(config.port, () => {
   void (async () => {
     await ensureSchema();
     await ensurePlatformSchema();
+    await syncUsersWithPostgres();
     console.log(`[server] rag: ${await checkRagDb()}`);
     await sessionMap.loadFromPostgres();
   })();

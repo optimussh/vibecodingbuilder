@@ -34,6 +34,8 @@ interface ChatState {
   streamLog: string[];
   error: string | null;
   es: EventSource | null;
+  projectId: string | null;
+  projectLabel: string;
 
   refreshHealth: () => Promise<void>;
   loadSessions: () => Promise<void>;
@@ -50,6 +52,7 @@ interface ChatState {
   pushStream: (line: string) => void;
   messageSearch: string;
   setMessageSearch: (q: string) => void;
+  setProject: (id: string | null, label?: string) => void;
 }
 
 export const useChatStore = create<ChatState>((set, get) => ({
@@ -64,9 +67,16 @@ export const useChatStore = create<ChatState>((set, get) => ({
   error: null,
   es: null,
   messageSearch: "",
+  projectId: null,
+  projectLabel: "Personal",
 
   setMessageSearch(q: string) {
     set({ messageSearch: q });
+  },
+
+  setProject(id: string | null, label = "Personal") {
+    set({ projectId: id, projectLabel: label || "Personal" });
+    void get().loadFiles();
   },
 
   async refreshHealth() {
@@ -203,7 +213,7 @@ export const useChatStore = create<ChatState>((set, get) => ({
 
   async loadFiles() {
     try {
-      const { tree } = await api.fsTree();
+      const { tree } = await api.fsTree(get().projectId);
       set({ fileTree: tree });
     } catch {
       set({ fileTree: [] });
@@ -211,7 +221,7 @@ export const useChatStore = create<ChatState>((set, get) => ({
   },
 
   async openFile(path: string) {
-    const file = await api.fsContent(path);
+    const file = await api.fsContent(path, get().projectId);
     set({ filePreview: file });
   },
 

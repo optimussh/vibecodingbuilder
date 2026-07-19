@@ -1,0 +1,48 @@
+# CodeHarbor production-ish stack (on-prem / VPC)
+# Usage:
+#   docker compose -f docker-compose.prod.yml up -d --build
+# OpenCode on host is recommended for Windows; set OPENCODE_BASE_URL accordingly.
+
+services:
+  postgres:
+    image: pgvector/pgvector:pg16
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: vibe
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-vibe}
+      POSTGRES_DB: vibe
+    volumes:
+      - codeharbor_pgdata:/var/lib/postgresql/data
+      - ./deploy/postgres/init.sql:/docker-entrypoint-initdb.d/01-init.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U vibe -d vibe"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  platform:
+    build:
+      context: .
+      dockerfile: deploy/Dockerfile.platform
+    restart: unless-stopped
+    ports:
+      - "${PORT:-3000}:3000"
+    env_file:
+      - .env
+    environment:
+      DATABASE_URL: postgres://vibe:${POSTGRES_PASSWORD:-vibe}@postgres:5432/vibe
+      OPENCODE_MANAGED: "false"
+      OPENCODE_BASE_URL: ${OPENCODE_BASE_URL:-http://host.docker.internal:4096}
+      OPENCHAMBER_URL: ${OPENCHAMBER_URL:-http://host.docker.internal:3001}
+      WORKSPACES_ROOT: /data/workspaces
+      PROJECTS_ROOT: /data/projects
+    volumes:
+      - ./data:/data
+    depends_on:
+      postgres:
+        condition: service_healthy
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
+volumes:
+  codeharbor_pgdata:
