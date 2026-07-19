@@ -2,7 +2,18 @@
 
 프로젝트 진행 현황 로그. 커밋 직전 갱신 (`claude_Template-main/rules/common/git.md`).
 
-사람용 요약 보드: [`docs/status/index.html`](docs/status/index.html)
+사람용 요약 보드: [`docs/status/index.html`](docs/status/index.html)  
+브랜드: [`docs/BRAND.md`](docs/BRAND.md) · 제품명 **CodeHarbor**
+
+---
+
+## 2026-07-19
+
+### 브랜드 — CodeHarbor
+
+- **What:** 대외 제품명을 **CodeHarbor** 로 확정. UI/README/포털/로그인 표시명 반영. 레포·npm 패키지명은 `vibecodingbuilder` 유지.
+- **Why:** 기업 내 바이브코딩 플랫폼 셀링·포지셔닝 (Governed Vibe Coding).
+- **Status:** done (표시 브랜딩)
 
 ---
 

@@ -29,9 +29,9 @@ export function LoginPage() {
         }}
         className="w-full max-w-sm rounded-2xl border border-zinc-800 bg-zinc-900 p-6 shadow-xl"
       >
-        <h1 className="text-xl font-semibold text-white">Vibecoding Builder</h1>
+        <h1 className="text-xl font-semibold text-white">CodeHarbor</h1>
         <p className="mt-1 text-sm text-zinc-400">
-          로그인 후 채팅 화면으로 이동합니다
+          사내 바이브코딩 플랫폼 · 로그인 후 채팅으로 이동합니다
         </p>
 
         <label className="mt-6 block text-xs text-zinc-400">Username</label>

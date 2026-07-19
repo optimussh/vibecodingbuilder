@@ -76,7 +76,7 @@ export function ChatPage() {
       <header className="flex items-center justify-between border-b border-zinc-800 bg-zinc-900 px-4 py-2">
         <div className="flex min-w-0 items-center gap-3">
           <span className="shrink-0 font-semibold text-white">
-            Vibecoding Builder
+            CodeHarbor
           </span>
           <span className="shrink-0 text-xs text-zinc-500">
             {user?.username} ({user?.role})

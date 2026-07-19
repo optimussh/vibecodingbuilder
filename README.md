@@ -1,4 +1,10 @@
-# Vibecoding Builder — Phase 0 + Phase 1 (로컬)
+# CodeHarbor
+
+**Governed Vibe Coding Platform** · 사내 바이브코딩 플랫폼  
+*Vibe coding. Enterprise control.*
+
+> 제품명 **CodeHarbor** · 레포/패키지 코드네임 `vibecodingbuilder`  
+> 브랜드: [`docs/BRAND.md`](docs/BRAND.md)
 
 로컬 AI 코딩 에이전트 셸. 자연어 → OpenCode → **유저별 워크스페이스** 산출물.
 

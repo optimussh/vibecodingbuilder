@@ -15,7 +15,7 @@ loginPageRouter.get("/login", (req, res) => {
 <head>
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
-  <title>Login · Vibecoding Builder</title>
+  <title>Login · CodeHarbor</title>
   <style>
     body{font-family:system-ui,sans-serif;background:#0c0d10;color:#e8eaed;margin:0;
       min-height:100vh;display:flex;align-items:center;justify-content:center}
@@ -36,8 +36,8 @@ loginPageRouter.get("/login", (req, res) => {
 </head>
 <body>
   <form id="f">
-    <h1>Vibecoding Builder</h1>
-    <p>플랫폼 로그인 후 목적지로 이동합니다</p>
+    <h1>CodeHarbor</h1>
+    <p>사내 바이브코딩 플랫폼 · 로그인 후 목적지로 이동합니다</p>
     <label>Username</label>
     <input name="username" id="u" value="user1" autocomplete="username" required />
     <label>Password</label>

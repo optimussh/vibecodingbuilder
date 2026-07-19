@@ -12,7 +12,7 @@ portalRouter.get("/", (req, res) => {
 <head>
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
-  <title>Vibecoding Builder</title>
+  <title>CodeHarbor</title>
   <style>
     body{font-family:system-ui,sans-serif;background:#0c0d10;color:#e8eaed;margin:0;padding:2rem}
     .wrap{max-width:44rem;margin:0 auto}
@@ -31,8 +31,8 @@ portalRouter.get("/", (req, res) => {
 </head>
 <body>
   <div class="wrap">
-    <h1>Vibecoding Builder</h1>
-    <p class="muted">로컬 풀스택 · :3000 게이트웨이 · :4096 OpenCode · :3001 Chamber · :5173 채팅</p>
+    <h1>CodeHarbor</h1>
+    <p class="muted">Governed vibe coding · :3000 게이트웨이 · :4096 OpenCode · :3001 Chamber · :5173 채팅</p>
     ${
       user
         ? `<p>로그인: <strong>${user.username}</strong> (${user.role})

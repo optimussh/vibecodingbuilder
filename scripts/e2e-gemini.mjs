@@ -61,7 +61,7 @@ const report = {
   nextSteps: [],
 };
 
-console.log("=== Vibecoding Builder · Gemini E2E helper ===\n");
+console.log("=== CodeHarbor · Gemini E2E helper ===\n");
 
 if (!report.geminiKeyConfigured || report.geminiKeyLooksPlaceholder) {
   console.log("❌ GEMINI_API_KEY missing or placeholder");
