@@ -1,5 +1,5 @@
 {
-  "name": "@vibe/web",
+  "name": "@codeharbor/web",
   "private": true,
   "type": "module",
   "scripts": {

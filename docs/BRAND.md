@@ -7,8 +7,9 @@
 | **Category (KO)** | 사내 바이브코딩 플랫폼 · 거버넌스형 AI 개발 워크스페이스 |
 | **Tagline (EN)** | Vibe coding. Enterprise control. |
 | **Tagline (KO)** | 빠르게 바이브 코딩하고, 기업 정책 안에서 통제한다. |
-| **Repo / package (technical)** | `vibecodingbuilder` (rename later if needed) |
-| **Former code name** | Vibecoding Builder |
+| **Repo / folder / npm root** | `codeharbor` |
+| **Workspaces** | `@codeharbor/server`, `@codeharbor/web` |
+| **Former code name** | Vibecoding Builder (`vibecodingbuilder`) |
 
 ## Positioning
 
@@ -19,7 +20,7 @@ Yes: multi-user gateway, workspace isolation, BFF (keys never in browser), audit
 
 ## Name notes
 
-- **CodeHarbor** — preferred external product name.
+- **CodeHarbor** — external product name and project identity.
 - Avoided: VibeHarbor (lifestyle brands), AgentDock / AgentHarbor (existing AI products), DevHarbor (cloud IDE etc.).
 - Adjacent open-source: openHPI *CodeHarbor* (programming exercises exchange, education). Differentiate with category line above.
 - CNCF *Harbor* (container registry) shares the word “Harbor” only — different product class.
@@ -29,3 +30,7 @@ Yes: multi-user gateway, workspace isolation, BFF (keys never in browser), audit
 - Developer-friendly, security-credible.
 - Prefer concrete claims: isolation, audit trail, central API keys, on-prem ready.
 - Avoid “unlimited free AI” / toy / hackathon tone in sales materials.
+
+## Related docs
+
+- Moat & roadmap: [`docs/superpowers/specs/2026-07-19-codeharbor-moat-roadmap.md`](superpowers/specs/2026-07-19-codeharbor-moat-roadmap.md)

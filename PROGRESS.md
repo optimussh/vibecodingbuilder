@@ -11,9 +11,17 @@
 
 ### 브랜드 — CodeHarbor
 
-- **What:** 대외 제품명을 **CodeHarbor** 로 확정. UI/README/포털/로그인 표시명 반영. 레포·npm 패키지명은 `vibecodingbuilder` 유지.
+- **What:** 대외 제품명을 **CodeHarbor** 로 확정. UI/README/포털/로그인 표시명 반영.
 - **Why:** 기업 내 바이브코딩 플랫폼 셀링·포지셔닝 (Governed Vibe Coding).
-- **Status:** done (표시 브랜딩)
+- **Status:** done
+
+### 프로젝트 아이덴티티 통일 + 해자 로드맵 스펙
+
+- **What:**
+  - 루트/폴더/패키지: `codeharbor`, `@codeharbor/server`, `@codeharbor/web`
+  - 해자·독립영역·P1 로드맵 스펙: `docs/superpowers/specs/2026-07-19-codeharbor-moat-roadmap.md`
+- **Why:** 코드네임 `vibecodingbuilder` 정리 + 셀링 방향 문서화
+- **Status:** done
 
 ---
 
